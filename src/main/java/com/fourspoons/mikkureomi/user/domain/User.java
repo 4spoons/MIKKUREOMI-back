@@ -35,4 +35,8 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }

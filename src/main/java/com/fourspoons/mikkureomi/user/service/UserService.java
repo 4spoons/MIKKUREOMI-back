@@ -6,6 +6,7 @@ import com.fourspoons.mikkureomi.jwt.JwtTokenProvider;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
 import com.fourspoons.mikkureomi.user.dto.LoginRequestDto;
 import com.fourspoons.mikkureomi.user.dto.LoginResponseDto;
+import com.fourspoons.mikkureomi.user.dto.UpdatePasswordRequestDto;
 import com.fourspoons.mikkureomi.user.repository.UserRepository;
 import com.fourspoons.mikkureomi.user.domain.User;
 import com.fourspoons.mikkureomi.user.dto.SignUpRequestDto;
@@ -69,6 +70,18 @@ public class UserService {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_PASSWORD.getMessage());
         }
+    }
+
+    @Transactional
+    public void updatePassword(Long userId, UpdatePasswordRequestDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND.getMessage()));
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException(ErrorMessage.INVALID_PASSWORD.getMessage());
+        }
+
+        user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
     }
 
     private String generateUserToken(User user) {
