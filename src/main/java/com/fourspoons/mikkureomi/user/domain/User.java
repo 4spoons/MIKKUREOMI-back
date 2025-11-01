@@ -4,6 +4,7 @@ import com.fourspoons.mikkureomi.profile.domain.Profile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -33,8 +35,4 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
-
-    public String getPassword() {
-        return password;
-    }
 }
