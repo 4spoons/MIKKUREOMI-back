@@ -47,4 +47,9 @@ public class ProfileService {
         profile.update(dto.getNickname(), dto.getAge(), dto.getGender());
         return ProfileResponseDto.from(profile);
     }
+
+    public void deleteProfile(Long userId) {
+        profileRepository.findByUser_UserId(userId)
+                .ifPresent(profileRepository::delete);
+    }
 }

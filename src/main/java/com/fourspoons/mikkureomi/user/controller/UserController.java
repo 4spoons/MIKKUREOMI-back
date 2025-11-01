@@ -47,4 +47,11 @@ public class UserController {
                 ApiResponse.success("비밀번호가 성공적으로 변경되었습니다.")
         );
     }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getUserId();
+        userService.deleteUser(userId);
+        return ResponseEntity.ok(ApiResponse.success("회원 탈퇴가 완료되었습니다."));
+    }
 }
