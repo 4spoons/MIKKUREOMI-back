@@ -202,4 +202,41 @@ class UserServiceTest {
         then(passwordEncoder).should(times(1)).matches(dto.getOldPassword(), user.getPassword());
         then(passwordEncoder).should(never()).encode(anyString());
     }
+
+    @Test
+    @DisplayName("회원 탈퇴 성공 시 프로필 서비스와 유저가 삭제된다")
+    void deleteUser_success() {
+        // given
+        Long userId = 1L;
+        User user = User.builder()
+                .userId(userId)
+                .email("test@example.com")
+                .password("encoded")
+                .build();
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        // when
+        userService.deleteUser(userId);
+
+        // then
+        then(profileService).should(times(1)).deleteProfile(userId);
+        then(userRepository).should(times(1)).delete(user);
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 실패 - 사용자를 찾을 수 없음")
+    void deleteUser_userNotFound() {
+        // given
+        Long userId = 999L;
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(userId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("사용자를 찾을 수 없습니다.");
+
+        then(profileService).shouldHaveNoInteractions();
+        then(userRepository).should(never()).delete(any());
+    }
 }

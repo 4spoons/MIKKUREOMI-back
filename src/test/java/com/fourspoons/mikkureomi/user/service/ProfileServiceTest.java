@@ -87,6 +87,22 @@ class ProfileServiceTest {
         then(profileRepository).should(times(1)).findByUser_UserId(1L);
     }
 
+    // ===================== 유저 삭제 시 프로필 삭제 테스트 =====================
+    @Test
+    @DisplayName("프로필이 존재하지 않아도 예외 없이 넘어간다")
+    void deleteProfile_notFound() {
+        // given
+        Long userId = 2L;
+        given(profileRepository.findByUser_UserId(userId)).willReturn(Optional.empty());
+
+        // when
+        profileService.deleteProfile(userId);
+
+        // then
+        // delete() 호출되지 않아야 함
+        then(profileRepository).should(never()).delete(any());
+    }
+
     // ===================== 프로필 수정 테스트 =====================
     // TODO: 프로필 수정 테스트 구현
 }
