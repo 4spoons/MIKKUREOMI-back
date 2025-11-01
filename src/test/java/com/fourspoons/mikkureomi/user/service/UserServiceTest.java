@@ -7,6 +7,7 @@ import com.fourspoons.mikkureomi.user.domain.User;
 import com.fourspoons.mikkureomi.user.dto.LoginRequestDto;
 import com.fourspoons.mikkureomi.user.dto.LoginResponseDto;
 import com.fourspoons.mikkureomi.user.dto.SignUpRequestDto;
+import com.fourspoons.mikkureomi.user.dto.UpdatePasswordRequestDto;
 import com.fourspoons.mikkureomi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -146,5 +147,59 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.login(dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(ErrorMessage.INVALID_PASSWORD.getMessage());
+    }
+
+    // ===================== 비밀번호 변경 테스트 =====================
+    @Test
+    @DisplayName("비밀번호 변경 성공 시 비밀번호가 업데이트된다")
+    void updatePassword_success() {
+        // given
+        Long userId = 1L;
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("old1234", "new1234");
+
+        User user = User.builder()
+                .userId(userId)
+                .email("test@example.com")
+                .password("encoded-old-password")
+                .build();
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(dto.getOldPassword(), user.getPassword())).willReturn(true);
+        given(passwordEncoder.encode(dto.getNewPassword())).willReturn("encoded-new-password");
+
+        // when
+        userService.updatePassword(userId, dto);
+
+        // then
+        assertThat(user.getPassword()).isEqualTo("encoded-new-password");
+
+        then(passwordEncoder).should(times(1))
+                .matches(dto.getOldPassword(), "encoded-old-password");
+
+        then(passwordEncoder).should(times(1))
+                .encode(dto.getNewPassword());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 기존 비밀번호 불일치")
+    void updatePassword_invalidOldPassword() {
+        // given
+        Long userId = 1L;
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("wrongOld", "newPassword");
+        User user = User.builder()
+                .userId(userId)
+                .password("encoded-old-password")
+                .build();
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(dto.getOldPassword(), user.getPassword())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> userService.updatePassword(userId, dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ErrorMessage.INVALID_PASSWORD.getMessage());
+
+        then(passwordEncoder).should(times(1)).matches(dto.getOldPassword(), user.getPassword());
+        then(passwordEncoder).should(never()).encode(anyString());
     }
 }
