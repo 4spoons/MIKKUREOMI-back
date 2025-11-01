@@ -4,6 +4,7 @@ import com.fourspoons.mikkureomi.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +40,11 @@ public class Profile {
 
     @Column(nullable = false)
     private LocalDateTime modifiedAt;
+
+    public void update(String nickname, int age, Gender gender) {
+        this.nickname = nickname;
+        this.age = age;
+        this.gender = gender;
+        this.modifiedAt = LocalDateTime.now();
+    }
 }
