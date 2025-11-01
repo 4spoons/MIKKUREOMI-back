@@ -1,0 +1,242 @@
+package com.fourspoons.mikkureomi.user.service;
+
+import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.jwt.JwtTokenProvider;
+import com.fourspoons.mikkureomi.profile.service.ProfileService;
+import com.fourspoons.mikkureomi.user.domain.User;
+import com.fourspoons.mikkureomi.user.dto.LoginRequestDto;
+import com.fourspoons.mikkureomi.user.dto.LoginResponseDto;
+import com.fourspoons.mikkureomi.user.dto.SignUpRequestDto;
+import com.fourspoons.mikkureomi.user.dto.UpdatePasswordRequestDto;
+import com.fourspoons.mikkureomi.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
+class UserServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private ProfileService profileService;
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
+    @InjectMocks
+    private UserService userService;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this); // ✅ mock 초기화 보장
+    }
+
+    // ===================== 회원가입 테스트 =====================
+
+    @Test
+    @DisplayName("회원가입 성공 시 user와 profile이 저장된다")
+    void signUp_success() {
+        // given
+        SignUpRequestDto dto = new SignUpRequestDto();
+        dto.setEmail("miku@example.com");
+        dto.setPassword("password123");
+        dto.setNickname("미꾸");
+        dto.setAge(16);
+
+        given(userRepository.existsByEmail(dto.getEmail())).willReturn(false);
+        given(passwordEncoder.encode(anyString())).willReturn("encoded-password");
+
+        // when
+        userService.signUp(dto);
+
+        // then
+        then(userRepository).should(times(1)).save(any(User.class));
+        then(profileService).should(times(1)).save(eq(dto), any(User.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 이미 존재하는 이메일")
+    void signUp_duplicateEmail() {
+        // given
+        SignUpRequestDto dto = new SignUpRequestDto();
+        dto.setEmail("miku@example.com");
+        given(userRepository.existsByEmail(dto.getEmail())).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> userService.signUp(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ErrorMessage.EMAIL_ALREADY_EXISTS.getMessage());
+
+        then(userRepository).should(never()).save(any());
+        then(profileService).shouldHaveNoInteractions();
+    }
+
+    // ===================== 로그인 테스트 =====================
+
+    @DisplayName("로그인 성공 - 이메일과 비밀번호가 올바르면 토큰을 반환한다")
+    @Test
+    void login_success() {
+        // given
+        LoginRequestDto dto = new LoginRequestDto("miku@example.com", "password123");
+
+        User user = User.builder()
+                .userId(1L)
+                .email(dto.getEmail())
+                .password("encodedPassword")
+                .build();
+
+        given(userRepository.findByEmail("miku@example.com"))
+                .willReturn(Optional.of(user));
+        given(passwordEncoder.matches("password123", "encodedPassword"))
+                .willReturn(true);
+        given(jwtTokenProvider.generateToken(anyLong(), anyString()))
+                .willReturn("mockedToken");
+
+        // when
+        LoginResponseDto response = userService.login(dto);
+
+        // then
+        assertThat(response)
+                .isNotNull()
+                .extracting(LoginResponseDto::getToken)
+                .isEqualTo("mockedToken");
+
+        then(userRepository).should(times(1)).findByEmail("miku@example.com");
+        then(passwordEncoder).should(times(1)).matches("password123", "encodedPassword");
+        then(jwtTokenProvider).should(times(1)).generateToken(1L, "miku@example.com");
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 이메일 존재하지 않음")
+    void login_userNotFound() {
+        // given
+        LoginRequestDto dto = new LoginRequestDto("miku@example.com", "password123");
+        given(userRepository.findByEmail(dto.getEmail())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.login(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ErrorMessage.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 비밀번호 불일치")
+    void login_invalidPassword() {
+        // given
+        LoginRequestDto dto = new LoginRequestDto("miku@example.com", "wrongpassword");
+        User user = User.builder()
+                .email(dto.getEmail())
+                .password("encoded-password")
+                .build();
+
+        given(userRepository.findByEmail(dto.getEmail())).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(dto.getPassword(), user.getPassword())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> userService.login(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ErrorMessage.INVALID_PASSWORD.getMessage());
+    }
+
+    // ===================== 비밀번호 변경 테스트 =====================
+    @Test
+    @DisplayName("비밀번호 변경 성공 시 비밀번호가 업데이트된다")
+    void updatePassword_success() {
+        // given
+        Long userId = 1L;
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("old1234", "new1234");
+
+        User user = User.builder()
+                .userId(userId)
+                .email("test@example.com")
+                .password("encoded-old-password")
+                .build();
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(dto.getOldPassword(), user.getPassword())).willReturn(true);
+        given(passwordEncoder.encode(dto.getNewPassword())).willReturn("encoded-new-password");
+
+        // when
+        userService.updatePassword(userId, dto);
+
+        // then
+        assertThat(user.getPassword()).isEqualTo("encoded-new-password");
+
+        then(passwordEncoder).should(times(1))
+                .matches(dto.getOldPassword(), "encoded-old-password");
+
+        then(passwordEncoder).should(times(1))
+                .encode(dto.getNewPassword());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 기존 비밀번호 불일치")
+    void updatePassword_invalidOldPassword() {
+        // given
+        Long userId = 1L;
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("wrongOld", "newPassword");
+        User user = User.builder()
+                .userId(userId)
+                .password("encoded-old-password")
+                .build();
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(dto.getOldPassword(), user.getPassword())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> userService.updatePassword(userId, dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ErrorMessage.INVALID_PASSWORD.getMessage());
+
+        then(passwordEncoder).should(times(1)).matches(dto.getOldPassword(), user.getPassword());
+        then(passwordEncoder).should(never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 성공 시 프로필 서비스와 유저가 삭제된다")
+    void deleteUser_success() {
+        // given
+        Long userId = 1L;
+        User user = User.builder()
+                .userId(userId)
+                .email("test@example.com")
+                .password("encoded")
+                .build();
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        // when
+        userService.deleteUser(userId);
+
+        // then
+        then(profileService).should(times(1)).deleteProfile(userId);
+        then(userRepository).should(times(1)).delete(user);
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 실패 - 사용자를 찾을 수 없음")
+    void deleteUser_userNotFound() {
+        // given
+        Long userId = 999L;
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(userId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("사용자를 찾을 수 없습니다.");
+
+        then(profileService).shouldHaveNoInteractions();
+        then(userRepository).should(never()).delete(any());
+    }
+}
