@@ -6,8 +6,9 @@ import com.fourspoons.mikkureomi.mealPicture.dto.request.MealPictureRequestDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.response.MealPictureResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.response.RecognizedFoodResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.service.MealPictureService;
+import com.fourspoons.mikkureomi.response.ApiResponse;
+import com.fourspoons.mikkureomi.response.ResponseMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,31 +25,31 @@ public class MealPictureController {
 
     /** 1-1. 사진 인식 요청 (저장 없음) */
     @PostMapping(value = "/recognize", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<RecognizedFoodResponseDto>> recognizeFoods(@RequestPart("imageFile") MultipartFile imageFile) {
+    public ResponseEntity<ApiResponse<List<RecognizedFoodResponseDto>>> recognizeFoods(@RequestPart("imageFile") MultipartFile imageFile) {
         List<RecognizedFoodResponseDto> recognizedFoods = mealPictureService.recognizeFoodsFromPicture(imageFile);
-        return ResponseEntity.ok(recognizedFoods); // 200 OK
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.RECOGNIZE_FOODS_SUCCESS.getMessage(), recognizedFoods)); // 200 OK
     }
 
     /** 1-2. 최종 저장 요청 (Meal, MealPicture, MealFood 모두 저장) */
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<MealFoodResponseDto>> saveFinalMeal(@RequestPart("imageFile") MultipartFile imageFile, @RequestPart("request") MealFinalSaveRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> saveFinalMeal(@RequestPart("imageFile") MultipartFile imageFile, @RequestPart("request") MealFinalSaveRequestDto requestDto) {
         List<MealFoodResponseDto> responseList =
                 mealPictureService.saveFinalMealComposition(imageFile, requestDto);
-        return new ResponseEntity<>(responseList, HttpStatus.CREATED);
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.SAVE_FINAL_MEAL_SUCCESS.getMessage(), responseList));
     }
 
     /** 2. 특정 MealPicture 조회 (GET by ID) */
     @GetMapping("/{pictureId}")
-    public ResponseEntity<MealPictureResponseDto> getMealPicture(@PathVariable Long pictureId) {
+    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPicture(@PathVariable Long pictureId) {
         MealPictureResponseDto responseDto = mealPictureService.getMealPicture(pictureId);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
     }
 
     /** 3. Meal ID로 MealPicture 조회 (GET by Meal ID) */
     @GetMapping("/by-meal/{mealId}")
-    public ResponseEntity<MealPictureResponseDto> getMealPictureByMealId(@PathVariable Long mealId) {
+    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPictureByMealId(@PathVariable Long mealId) {
         MealPictureResponseDto responseDto = mealPictureService.getMealPictureByMealId(mealId);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
     }
 
 //    /** 4. MealPicture 수정 (PUT) */
