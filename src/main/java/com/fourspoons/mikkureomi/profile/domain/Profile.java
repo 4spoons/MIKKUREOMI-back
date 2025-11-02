@@ -34,11 +34,11 @@ public class Profile extends BaseTimeEntity {
     private Gender gender;
 
     @Column(nullable = false)
-    private int age;
+    private int birthYear;
 
-    public void update(String nickname, int age, Gender gender) {
+    public void update(String nickname, int birthYear, Gender gender) {
         this.nickname = nickname;
-        this.age = age;
+        this.birthYear = birthYear;
         this.gender = gender;
     }
 }

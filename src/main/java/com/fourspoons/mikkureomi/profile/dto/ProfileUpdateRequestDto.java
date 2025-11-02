@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProfileUpdateRequestDto {
     private String nickname;
-    private int age;
+    private int birthYear;
     private Gender gender;
 }
