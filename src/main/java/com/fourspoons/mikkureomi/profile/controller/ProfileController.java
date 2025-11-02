@@ -5,7 +5,7 @@ import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
 import com.fourspoons.mikkureomi.profile.dto.ProfileUpdateRequestDto;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
-import common.ApiResponse;
+import com.fourspoons.mikkureomi.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

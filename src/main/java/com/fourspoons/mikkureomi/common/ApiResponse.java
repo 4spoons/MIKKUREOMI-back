@@ -1,4 +1,4 @@
-package common;
+package com.fourspoons.mikkureomi.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
