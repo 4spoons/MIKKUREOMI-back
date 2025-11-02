@@ -1,6 +1,6 @@
 package com.fourspoons.mikkureomi.user.service;
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.jwt.JwtTokenProvider;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
 import com.fourspoons.mikkureomi.user.domain.User;

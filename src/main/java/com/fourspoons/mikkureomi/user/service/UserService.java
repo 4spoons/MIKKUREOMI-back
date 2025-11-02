@@ -1,7 +1,8 @@
 package com.fourspoons.mikkureomi.user.service;
 
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.CustomException;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.jwt.JwtTokenProvider;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
 import com.fourspoons.mikkureomi.user.dto.*;
@@ -37,7 +38,7 @@ public class UserService {
 
     public void validateDuplicateEmail(String email) {
         if(userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException(ErrorMessage.EMAIL_ALREADY_EXISTS.getMessage());
+            throw new CustomException(ErrorMessage.EMAIL_ALREADY_EXISTS);
         }
     }
 
@@ -52,7 +53,7 @@ public class UserService {
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND.getMessage()));
+                        new CustomException(ErrorMessage.USER_NOT_FOUND));
     }
 
 
@@ -61,17 +62,17 @@ public class UserService {
         System.out.println("encodedPassword = " + encodedPassword);
 
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_PASSWORD.getMessage());
+            throw new CustomException(ErrorMessage.INVALID_PASSWORD);
         }
     }
 
     @Transactional
     public void updatePassword(Long userId, UpdatePasswordRequestDto dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new CustomException(ErrorMessage.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_PASSWORD.getMessage());
+            throw new CustomException(ErrorMessage.INVALID_PASSWORD);
         }
 
         user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
@@ -79,12 +80,12 @@ public class UserService {
 
     public void deleteUser(Long userId, PasswordRequestDto dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new CustomException(ErrorMessage.USER_NOT_FOUND));
 
         String rawPassword = dto.getPassword();
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_PASSWORD.getMessage());
+            throw new CustomException(ErrorMessage.INVALID_PASSWORD);
         }
 
         profileService.deleteProfile(userId);

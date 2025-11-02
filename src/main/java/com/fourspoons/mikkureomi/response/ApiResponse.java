@@ -1,11 +1,13 @@
-package com.fourspoons.mikkureomi.common;
+package com.fourspoons.mikkureomi.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 // 일관된 API 응답 포맷 유지를 위한 클래스
 @Getter
 @AllArgsConstructor(staticName = "of")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     private boolean success;
     private String message;

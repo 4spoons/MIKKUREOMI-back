@@ -1,10 +1,10 @@
 package com.fourspoons.mikkureomi.user.controller;
 
-import com.fourspoons.mikkureomi.constants.ResponseMessage;
+import com.fourspoons.mikkureomi.response.ResponseMessage;
 import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
 import com.fourspoons.mikkureomi.user.dto.*;
 import com.fourspoons.mikkureomi.user.service.UserService;
-import com.fourspoons.mikkureomi.common.ApiResponse;
+import com.fourspoons.mikkureomi.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

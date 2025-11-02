@@ -1,7 +1,7 @@
 package com.fourspoons.mikkureomi.user.service;
 
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.profile.domain.Gender;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;

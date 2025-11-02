@@ -1,6 +1,6 @@
 package com.fourspoons.mikkureomi.profile.service;
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
 import com.fourspoons.mikkureomi.profile.dto.ProfileUpdateRequestDto;

@@ -1,5 +1,7 @@
 package com.fourspoons.mikkureomi.config;
 
+import com.fourspoons.mikkureomi.jwt.JwtAccessDeniedHandler;
+import com.fourspoons.mikkureomi.jwt.JwtAuthenticationEntryPoint;
 import com.fourspoons.mikkureomi.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -102,6 +102,9 @@ public class SecurityConfig {
 
                         // [3순위] 위에서 정의한 경로 외의 모든 요청은 반드시 인증(토큰) 필요
                         .anyRequest().authenticated()
+                ) .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())   // 인증 실패 처리
+                        .accessDeniedHandler(new JwtAccessDeniedHandler())             // 인가 실패 처리
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
