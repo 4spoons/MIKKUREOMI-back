@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/meal-pictures")
+@RequestMapping("/api/meal-pictures")
 @RequiredArgsConstructor
 public class MealPictureController {
 
@@ -51,17 +51,17 @@ public class MealPictureController {
         return ResponseEntity.ok(responseDto);
     }
 
-    /** 4. MealPicture 수정 (PUT) */
-    @PutMapping("/{pictureId}")
-    public ResponseEntity<MealPictureResponseDto> updateMealPicture(@PathVariable Long pictureId, @RequestBody MealPictureRequestDto requestDto) {
-        MealPictureResponseDto responseDto = mealPictureService.updateMealPicture(pictureId, requestDto);
-        return ResponseEntity.ok(responseDto);
-    }
+//    /** 4. MealPicture 수정 (PUT) */
+//    @PutMapping("/{pictureId}")
+//    public ResponseEntity<MealPictureResponseDto> updateMealPicture(@PathVariable Long pictureId, @RequestBody MealPictureRequestDto requestDto) {
+//        MealPictureResponseDto responseDto = mealPictureService.updateMealPicture(pictureId, requestDto);
+//        return ResponseEntity.ok(responseDto);
+//    }
 
-    /** 5. MealPicture 삭제 (DELETE) */
-    @DeleteMapping("/{pictureId}")
-    public ResponseEntity<Void> deleteMealPicture(@PathVariable Long pictureId) {
-        mealPictureService.deleteMealPicture(pictureId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+//    /** 5. MealPicture 삭제 (DELETE) */
+//    @DeleteMapping("/{pictureId}")
+//    public ResponseEntity<Void> deleteMealPicture(@PathVariable Long pictureId) {
+//        mealPictureService.deleteMealPicture(pictureId);
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }
