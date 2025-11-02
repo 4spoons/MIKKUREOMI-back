@@ -22,7 +22,10 @@ public enum ResponseMessage {
     // MealPicture
     RECOGNIZE_FOODS_SUCCESS("음식 인식에 성공하였습니다"),
     SAVE_FINAL_MEAL_SUCCESS("사진 및 음식 리스트가 저장되었습니다"),
-    GET_PICTURE_SUCCESS("사진 조회를 완료하였습니다");
+    GET_PICTURE_SUCCESS("사진 조회가 완료되었습니다"),
+
+    // Meal
+    GET_MEAL_SUCCESS("식사 정보 조회가 완료되었습니다.");
 
 
     private final String message;

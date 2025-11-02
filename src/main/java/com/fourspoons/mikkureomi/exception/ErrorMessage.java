@@ -23,6 +23,9 @@ public enum ErrorMessage {
     // --- MealPicture ---
     MEAL_PICTURE_NOT_FOUND("해당 Meal에 연결된 MealPicture를 찾을 수 없습니다."),
 
+    // --- Meal ---
+    MEAL_NOT_FOUND("해당 Meal 정보를 찾을 수 없습니다."),
+
     // --- Server ---
     INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 

@@ -1,6 +1,8 @@
 package com.fourspoons.mikkureomi.meal.service;
 
 
+import com.fourspoons.mikkureomi.exception.CustomException;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
 import com.fourspoons.mikkureomi.meal.dto.request.MealRequestDto;
 import com.fourspoons.mikkureomi.meal.dto.response.MealResponseDto;
@@ -10,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,29 @@ import java.util.stream.Collectors;
 public class MealService {
 
     private final MealRepository mealRepository;
+
+    // 추가 기능 1: MealId로 상세 조회 (연관관계 포함)
+    public MealResponseDto getMealDetailById(Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_NOT_FOUND));
+
+        return new MealResponseDto(meal);
+    }
+
+
+    // 추가 기능 2: 날짜로 Meal 리스트 조회 (연관관계 포함)
+    public List<MealResponseDto> getMealsByDate(LocalDate date) {
+
+        // 조회 기간 설정: 해당 날짜 00:00:00 부터 다음 날 00:00:00 이전까지
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfNextDay = date.plusDays(1).atStartOfDay();
+
+        List<Meal> meals = mealRepository.findMealsWithDetailsByDateRange(startOfDay, endOfNextDay);
+
+        return meals.stream()
+                .map(MealResponseDto::new) // 각 Meal의 연관관계 정보도 DTO에 포함
+                .collect(Collectors.toList());
+    }
 
     /** 1. 식사 등록 (Create) */
     @Transactional
