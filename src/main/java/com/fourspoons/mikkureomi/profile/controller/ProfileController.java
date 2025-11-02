@@ -16,19 +16,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/api/users")
+@RequestMapping("/api/profile")
 @RequiredArgsConstructor
 public class ProfileController {
     private final ProfileService profileService;
 
-    @GetMapping("/profile")
+    @GetMapping()
     public ResponseEntity<ApiResponse<ProfileResponseDto>> getProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getUserId();
         ProfileResponseDto profileResponseDto = profileService.getProfile(userId);
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.PROFILE_FETCH_SUCCESS.getMessage(), profileResponseDto));
     }
 
-    @PutMapping("/profile")
+    @PutMapping()
     public ResponseEntity<ApiResponse<ProfileResponseDto>> updateProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ProfileUpdateRequestDto dto
