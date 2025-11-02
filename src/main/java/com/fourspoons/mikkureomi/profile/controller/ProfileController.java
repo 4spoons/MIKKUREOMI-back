@@ -1,11 +1,11 @@
 package com.fourspoons.mikkureomi.profile.controller;
 
-import com.fourspoons.mikkureomi.constants.ResponseMessage;
+import com.fourspoons.mikkureomi.response.ResponseMessage;
 import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
 import com.fourspoons.mikkureomi.profile.dto.ProfileUpdateRequestDto;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
-import common.ApiResponse;
+import com.fourspoons.mikkureomi.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,19 +16,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/api/users")
+@RequestMapping("/api/profile")
 @RequiredArgsConstructor
 public class ProfileController {
     private final ProfileService profileService;
 
-    @GetMapping("/profile")
+    @GetMapping()
     public ResponseEntity<ApiResponse<ProfileResponseDto>> getProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getUserId();
         ProfileResponseDto profileResponseDto = profileService.getProfile(userId);
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.PROFILE_FETCH_SUCCESS.getMessage(), profileResponseDto));
     }
 
-    @PutMapping("/profile")
+    @PutMapping()
     public ResponseEntity<ApiResponse<ProfileResponseDto>> updateProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ProfileUpdateRequestDto dto

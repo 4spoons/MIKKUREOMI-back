@@ -1,11 +1,10 @@
 package com.fourspoons.mikkureomi.user.service;
 
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.profile.domain.Gender;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
-import com.fourspoons.mikkureomi.profile.dto.ProfileUpdateRequestDto;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
 import com.fourspoons.mikkureomi.user.domain.User;
@@ -50,7 +49,7 @@ class ProfileServiceTest {
                 .profileId(1L)
                 .user(testUser)
                 .nickname("미꾸")
-                .age(25)
+                .birthYear(2010)
                 .gender(Gender.FEMALE)
                 .build();
     }
@@ -68,7 +67,7 @@ class ProfileServiceTest {
 
         // then
         assertThat(result.getNickname()).isEqualTo("미꾸");
-        assertThat(result.getAge()).isEqualTo(25);
+        assertThat(result.getBirthYear()).isEqualTo(2010);
         assertThat(result.getGender()).isEqualTo(Gender.FEMALE);
         then(profileRepository).should(times(1)).findByUser_UserId(1L);
     }

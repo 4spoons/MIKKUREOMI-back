@@ -1,13 +1,10 @@
 package com.fourspoons.mikkureomi.user.controller;
 
-import com.fourspoons.mikkureomi.constants.ResponseMessage;
+import com.fourspoons.mikkureomi.response.ResponseMessage;
 import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
-import com.fourspoons.mikkureomi.user.dto.LoginRequestDto;
-import com.fourspoons.mikkureomi.user.dto.LoginResponseDto;
-import com.fourspoons.mikkureomi.user.dto.UpdatePasswordRequestDto;
+import com.fourspoons.mikkureomi.user.dto.*;
 import com.fourspoons.mikkureomi.user.service.UserService;
-import com.fourspoons.mikkureomi.user.dto.SignUpRequestDto;
-import common.ApiResponse;
+import com.fourspoons.mikkureomi.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,14 +41,18 @@ public class UserController {
         Long userId = userDetails.getUser().getUserId();
         userService.updatePassword(userId, dto);
         return ResponseEntity.ok(
-                ApiResponse.success("비밀번호가 성공적으로 변경되었습니다.")
+                ApiResponse.success(ResponseMessage.PWD_UPDATE_SUCCESS.getMessage())
         );
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody PasswordRequestDto dto) {
         Long userId = userDetails.getUser().getUserId();
-        userService.deleteUser(userId);
-        return ResponseEntity.ok(ApiResponse.success("회원 탈퇴가 완료되었습니다."));
+        userService.deleteUser(userId, dto);
+        return ResponseEntity.ok(
+                ApiResponse.success(ResponseMessage.DELETE_ACCOUNT_SUCCESS.getMessage())
+        );
     }
 }
