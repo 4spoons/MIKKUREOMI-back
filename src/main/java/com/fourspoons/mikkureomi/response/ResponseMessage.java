@@ -16,8 +16,8 @@ public enum ResponseMessage {
     PROFILE_FETCH_SUCCESS("프로필 조회가 완료되었습니다."),
 
     // MealFood
-    CREATE_MEALFOOD_SUCCESS("음식 리스트가 저장되었습니다."),
-    GET_MEALFOODS_SUCCESS("음식 리스트 조회를 완료하였습니다."),
+    CREATE_MEAL_FOOD_SUCCESS("음식 리스트가 저장되었습니다."),
+    GET_MEAL_FOODS_SUCCESS("음식 리스트 조회를 완료하였습니다."),
 
     // MealPicture
     RECOGNIZE_FOODS_SUCCESS("음식 인식에 성공하였습니다"),

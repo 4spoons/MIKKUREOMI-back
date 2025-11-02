@@ -99,6 +99,9 @@ public class SecurityConfig {
 
                         // [2순위] 회원가입, 로그인 API는 인증 없이 접근 허용
                         .requestMatchers(HttpMethod.POST, "/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/meal-foods/**", "/api/meal-pictures/**").permitAll() // 테스트
+                        .requestMatchers(HttpMethod.GET, "/api/meal-foods/**", "/api/meal-pictures/**").permitAll() // 테스트
+
 
                         // [3순위] 위에서 정의한 경로 외의 모든 요청은 반드시 인증(토큰) 필요
                         .anyRequest().authenticated()

@@ -38,12 +38,12 @@ public class MealPictureController {
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.SAVE_FINAL_MEAL_SUCCESS.getMessage(), responseList));
     }
 
-    /** 2. 특정 MealPicture 조회 (GET by ID) */
-    @GetMapping("/{pictureId}")
-    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPicture(@PathVariable Long pictureId) {
-        MealPictureResponseDto responseDto = mealPictureService.getMealPicture(pictureId);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
-    }
+//    /** 2. 특정 MealPicture 조회 (GET by ID) */
+//    @GetMapping("/{pictureId}")
+//    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPicture(@PathVariable Long pictureId) {
+//        MealPictureResponseDto responseDto = mealPictureService.getMealPicture(pictureId);
+//        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
+//    }
 
     /** 3. Meal ID로 MealPicture 조회 (GET by Meal ID) */
     @GetMapping("/by-meal/{mealId}")

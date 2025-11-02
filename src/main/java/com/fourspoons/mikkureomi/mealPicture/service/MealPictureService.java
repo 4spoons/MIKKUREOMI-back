@@ -1,6 +1,8 @@
 package com.fourspoons.mikkureomi.mealPicture.service;
 
 import com.fourspoons.mikkureomi.aws.AwsS3Service;
+import com.fourspoons.mikkureomi.exception.CustomException;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
 import com.fourspoons.mikkureomi.meal.repository.MealRepository;
 import com.fourspoons.mikkureomi.mealFood.domain.MealFood;
@@ -99,7 +101,7 @@ public class MealPictureService {
     /** 3. Meal ID로 MealPicture 조회 (Read by Meal ID) */
     public MealPictureResponseDto getMealPictureByMealId(Long mealId) {
         MealPicture picture = mealPictureRepository.findByMeal_MealId(mealId)
-                .orElseThrow(() -> new EntityNotFoundException("MealPicture not found for Meal id: " + mealId));
+                .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_PICTURE_NOT_FOUND));
         return new MealPictureResponseDto(picture);
     }
 
@@ -126,12 +128,12 @@ public class MealPictureService {
     // 음식 인식 더미 데이터 (예시)
     private List<MealFoodRequestDto> createDummyFoodRequests() {
         // Dummy 1: 샐러드
-        MealFoodRequestDto salad = new MealFoodRequestDto("샐러드", new BigDecimal("150"), new BigDecimal("180"),
+        MealFoodRequestDto salad = new MealFoodRequestDto("샐러드", new BigDecimal("1"), new BigDecimal("180"),
                 new BigDecimal("15"), new BigDecimal("5"),
                 new BigDecimal("10"), new BigDecimal("10"), new BigDecimal("5"));
 
         // Dummy 2: 닭가슴살
-        MealFoodRequestDto chicken = new MealFoodRequestDto("닭가슴살", new BigDecimal("100"), new BigDecimal("150"),
+        MealFoodRequestDto chicken = new MealFoodRequestDto("닭가슴살", new BigDecimal("1"), new BigDecimal("150"),
                 new BigDecimal("0"), new BigDecimal("0"),
                 new BigDecimal("30"), new BigDecimal("3"), new BigDecimal("0"));
 

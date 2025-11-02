@@ -9,7 +9,6 @@ import lombok.Setter;
 // 요청의 구조를 정의하기 위해 유지합니다.
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class MealRequestDto {
 

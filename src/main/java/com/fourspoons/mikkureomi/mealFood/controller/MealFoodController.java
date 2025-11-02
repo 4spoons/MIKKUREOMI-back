@@ -25,14 +25,14 @@ public class MealFoodController {
     @PostMapping
     public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> createMealWithFoods(@RequestBody MealCreateRequestDto requestDto) {
         List<MealFoodResponseDto> responseList = mealFoodService.createMealWithFoods(requestDto);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.CREATE_MEALFOOD_SUCCESS.getMessage(), responseList)); // 201 Created
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.CREATE_MEAL_FOOD_SUCCESS.getMessage(), responseList)); // 201 Created
     }
 
     /** 2. 특정 Meal에 속한 MealFood 목록 조회 (GET List by Meal ID) */
     @GetMapping("/by-meal/{mealId}")
     public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> getMealFoodsByMealId(@PathVariable Long mealId) {
         List<MealFoodResponseDto> responseList = mealFoodService.getMealFoodsByMealId(mealId);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.CREATE_MEALFOOD_SUCCESS.getMessage(), responseList)); // 200 OK
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_MEAL_FOODS_SUCCESS.getMessage(), responseList)); // 200 OK
     }
 
 //    /** 3. 특정 MealFood 단일 수정 (PUT) */
