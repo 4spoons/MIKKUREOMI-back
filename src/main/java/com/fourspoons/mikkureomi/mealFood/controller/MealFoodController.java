@@ -2,7 +2,7 @@ package com.fourspoons.mikkureomi.mealFood.controller;
 
 
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealCreateRequestDto;
-import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodListResponse;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
 import com.fourspoons.mikkureomi.mealFood.service.MealFoodService;
 import com.fourspoons.mikkureomi.response.ApiResponse;
@@ -30,9 +30,9 @@ public class MealFoodController {
 
     /** 2. 특정 Meal에 속한 MealFood 목록 조회 (GET List by Meal ID) */
     @GetMapping("/by-meal/{mealId}")
-    public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> getMealFoodsByMealId(@PathVariable Long mealId) {
-        List<MealFoodResponseDto> responseList = mealFoodService.getMealFoodsByMealId(mealId);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_MEAL_FOODS_SUCCESS.getMessage(), responseList)); // 200 OK
+    public ResponseEntity<ApiResponse<MealFoodListResponse>> getMealFoodsByMealId(@PathVariable Long mealId) {
+        MealFoodListResponse response = mealFoodService.getMealFoodsByMealId(mealId);
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_MEAL_FOODS_SUCCESS.getMessage(), response)); // 200 OK
     }
 
 //    /** 3. 특정 MealFood 단일 수정 (PUT) */

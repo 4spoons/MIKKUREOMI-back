@@ -1,10 +1,13 @@
 package com.fourspoons.mikkureomi.mealFood.service;
 
+import com.fourspoons.mikkureomi.exception.CustomException;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
 import com.fourspoons.mikkureomi.meal.repository.MealRepository;
 import com.fourspoons.mikkureomi.mealFood.domain.MealFood;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealCreateRequestDto;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodListResponse;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
 import com.fourspoons.mikkureomi.mealFood.repository.MealFoodRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -57,13 +60,18 @@ public class MealFoodService {
     }
 
     /** 2. 특정 식사에 속한 음식 목록 조회 (Read List by Meal ID) */
-    public List<MealFoodResponseDto> getMealFoodsByMealId(Long mealId) {
-        // mealFoodRepository.findAllByMeal_MealId(mealId)는 Optional<List>일 필요가 없으므로 바로 반환
-        List<MealFood> mealFoods = mealFoodRepository.findAllByMeal_MealId(mealId);
+    public MealFoodListResponse getMealFoodsByMealId(Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_NOT_FOUND));
 
-        return mealFoods.stream()
+        List<MealFood> mealFoods = mealFoodRepository.findAllByMeal_MealId(meal.getMealId());
+
+        List<MealFoodResponseDto> mealFoodDtos = mealFoods.stream()
                 .map(MealFoodResponseDto::new)
                 .collect(Collectors.toList());
+
+        // Wrapper DTO에 목록과 개수를 담아 반환
+        return new MealFoodListResponse(mealFoodDtos.size(), mealFoodDtos);
     }
 
     /** 3. 특정 MealFood 단일 수정 (Update) */
