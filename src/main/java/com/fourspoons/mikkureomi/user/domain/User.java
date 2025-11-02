@@ -1,5 +1,6 @@
 package com.fourspoons.mikkureomi.user.domain;
 
+import com.fourspoons.mikkureomi.common.BaseTimeEntity;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id")
@@ -26,12 +27,6 @@ public class User {
 
     @Column(nullable = false, length = 500)
     private String password;
-
-    @Column(nullable = false)
-    private LocalDateTime createdDate;
-
-    @Column(nullable = false)
-    private LocalDateTime modifiedDate;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
