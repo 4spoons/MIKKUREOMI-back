@@ -49,7 +49,8 @@ public class MealService {
     }
 
     // 추가 기능 1: MealId로 상세 조회 (연관관계 포함)
-    public MealResponseDto getMealDetailById(Long mealId) {
+    public MealResponseDto getMealDetailById(Long profileId, Long mealId) {
+        checkAccessToMeal(profileId, mealId);
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_NOT_FOUND));
 
@@ -58,17 +59,30 @@ public class MealService {
 
 
     // 추가 기능 2: 날짜로 Meal 리스트 조회 (연관관계 포함)
-    public List<MealResponseDto> getMealsByDate(LocalDate date) {
+    public List<MealResponseDto> getMealsByDate(Long profileId, LocalDate date) {
 
         // 조회 기간 설정: 해당 날짜 00:00:00 부터 다음 날 00:00:00 이전까지
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfNextDay = date.plusDays(1).atStartOfDay();
 
-        List<Meal> meals = mealRepository.findMealsWithDetailsByDateRange(startOfDay, endOfNextDay);
+        List<Meal> meals = mealRepository.findMealsWithDetailsByDateRange(startOfDay, endOfNextDay, profileId);
 
         return meals.stream()
                 .map(MealResponseDto::new) // 각 Meal의 연관관계 정보도 DTO에 포함
                 .collect(Collectors.toList());
+    }
+
+    public void checkAccessToMeal (Long profileId, Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_NOT_FOUND));
+
+        // 작성자 ID와 현재 사용자 ID 비교
+        Long mealOwnerProfileId = meal.getDailyReport().getProfile().getProfileId();
+
+        // ID가 다르면 권한 없음 예외 발생
+        if (!mealOwnerProfileId.equals(profileId)) {
+            throw new CustomException(ErrorMessage.ACCESS_DENIED);
+        }
     }
 
 

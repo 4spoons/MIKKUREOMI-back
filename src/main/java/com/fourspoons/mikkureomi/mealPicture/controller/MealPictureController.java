@@ -42,19 +42,20 @@ public class MealPictureController {
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.SAVE_FINAL_MEAL_SUCCESS.getMessage(), responseList));
     }
 
+    /** 3. Meal ID로 MealPicture 조회 (GET by Meal ID) */
+    @GetMapping("/by-meal/{mealId}")
+    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPictureByMealId(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long mealId) {
+        Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());
+        MealPictureResponseDto responseDto = mealPictureService.getMealPictureByMealId(profileId, mealId);
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
+    }
+
 //    /** 2. 특정 MealPicture 조회 (GET by ID) */
 //    @GetMapping("/{pictureId}")
 //    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPicture(@PathVariable Long pictureId) {
 //        MealPictureResponseDto responseDto = mealPictureService.getMealPicture(pictureId);
 //        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
 //    }
-
-    /** 3. Meal ID로 MealPicture 조회 (GET by Meal ID) */
-    @GetMapping("/by-meal/{mealId}")
-    public ResponseEntity<ApiResponse<MealPictureResponseDto>> getMealPictureByMealId(@PathVariable Long mealId) {
-        MealPictureResponseDto responseDto = mealPictureService.getMealPictureByMealId(mealId);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_PICTURE_SUCCESS.getMessage(), responseDto));
-    }
 
 //    /** 4. MealPicture 수정 (PUT) */
 //    @PutMapping("/{pictureId}")

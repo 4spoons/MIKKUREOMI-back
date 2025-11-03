@@ -91,17 +91,19 @@ public class MealPictureService {
     }
 
 
+    /** 3. Meal ID로 MealPicture 조회 (Read by Meal ID) */
+    public MealPictureResponseDto getMealPictureByMealId(Long profileId, Long mealId) {
+        mealService.checkAccessToMeal(profileId, mealId);
+
+        MealPicture picture = mealPictureRepository.findByMeal_MealId(mealId)
+                .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_PICTURE_NOT_FOUND));
+        return new MealPictureResponseDto(picture);
+    }
+
     /** 2. 특정 MealPicture 조회 (Read One) */
     public MealPictureResponseDto getMealPicture(Long pictureId) {
         MealPicture picture = mealPictureRepository.findById(pictureId)
                 .orElseThrow(() -> new EntityNotFoundException("MealPicture not found with id: " + pictureId));
-        return new MealPictureResponseDto(picture);
-    }
-
-    /** 3. Meal ID로 MealPicture 조회 (Read by Meal ID) */
-    public MealPictureResponseDto getMealPictureByMealId(Long mealId) {
-        MealPicture picture = mealPictureRepository.findByMeal_MealId(mealId)
-                .orElseThrow(() -> new CustomException(ErrorMessage.MEAL_PICTURE_NOT_FOUND));
         return new MealPictureResponseDto(picture);
     }
 
