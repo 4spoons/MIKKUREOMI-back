@@ -4,7 +4,7 @@ import com.fourspoons.mikkureomi.aws.AwsS3Service;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
-import com.fourspoons.mikkureomi.meal.repository.MealRepository;
+import com.fourspoons.mikkureomi.meal.service.MealService;
 import com.fourspoons.mikkureomi.mealFood.domain.MealFood;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 public class MealPictureService {
 
     private final MealPictureRepository mealPictureRepository;
-    private final MealRepository mealRepository;
     private final MealFoodRepository mealFoodRepository;
     private final AwsS3Service awsS3Service;
+    private final MealService mealService;
 
     /** 1-1. 사진 URL을 받아 인식된 음식 목록을 반환합니다. (저장 로직 없음) */
     public List<RecognizedFoodResponseDto> recognizeFoodsFromPicture(MultipartFile imageFile) {
@@ -52,13 +52,13 @@ public class MealPictureService {
 
     /** 1-2. 최종 확정된 음식 목록과 URL을 받아 모든 엔티티를 생성하고 저장합니다. */
     @Transactional
-    public List<MealFoodResponseDto> saveFinalMealComposition(MultipartFile imageFile, MealFinalSaveRequestDto requestDto) {
+    public List<MealFoodResponseDto> saveFinalMealComposition(Long profileId, MultipartFile imageFile, MealFinalSaveRequestDto requestDto) {
 
         // 1. S3에 파일 업로드 및 URL 획득
         String imageUrl = awsS3Service.upload(imageFile);
 
         // 2. Meal 생성 및 저장
-        Meal newMeal = mealRepository.save(Meal.builder().build());
+        Meal newMeal = mealService.createMeal(profileId);
 
         // 3. MealPicture 생성 및 저장
         MealPicture mealPicture = MealPicture.builder()

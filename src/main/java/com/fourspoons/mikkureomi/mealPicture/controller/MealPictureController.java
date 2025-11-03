@@ -1,16 +1,18 @@
 package com.fourspoons.mikkureomi.mealPicture.controller;
 
+import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.request.MealFinalSaveRequestDto;
-import com.fourspoons.mikkureomi.mealPicture.dto.request.MealPictureRequestDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.response.MealPictureResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.response.RecognizedFoodResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.service.MealPictureService;
+import com.fourspoons.mikkureomi.profile.service.ProfileService;
 import com.fourspoons.mikkureomi.response.ApiResponse;
 import com.fourspoons.mikkureomi.response.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import java.util.List;
 public class MealPictureController {
 
     private final MealPictureService mealPictureService;
+    private final ProfileService profileService;
 
     /** 1-1. 사진 인식 요청 (저장 없음) */
     @PostMapping(value = "/recognize", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -32,9 +35,10 @@ public class MealPictureController {
 
     /** 1-2. 최종 저장 요청 (Meal, MealPicture, MealFood 모두 저장) */
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> saveFinalMeal(@RequestPart("imageFile") MultipartFile imageFile, @RequestPart("request") MealFinalSaveRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> saveFinalMeal(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestPart("imageFile") MultipartFile imageFile, @RequestPart("request") MealFinalSaveRequestDto requestDto) {
+        Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());
         List<MealFoodResponseDto> responseList =
-                mealPictureService.saveFinalMealComposition(imageFile, requestDto);
+                mealPictureService.saveFinalMealComposition(profileId, imageFile, requestDto);
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.SAVE_FINAL_MEAL_SUCCESS.getMessage(), responseList));
     }
 

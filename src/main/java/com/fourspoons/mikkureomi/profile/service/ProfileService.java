@@ -37,6 +37,13 @@ public class ProfileService {
         return ProfileResponseDto.from(profile);
     }
 
+    @Transactional(readOnly = true)
+    public Long getProfileId(Long userId) {
+        Profile profile = profileRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.PROFILE_NOT_FOUND.getMessage()));
+        return profile.getProfileId();
+    }
+
     public ProfileResponseDto updateProfile(Long userId, ProfileUpdateRequestDto dto) {
         Profile profile = profileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 프로필을 찾을 수 없습니다."));

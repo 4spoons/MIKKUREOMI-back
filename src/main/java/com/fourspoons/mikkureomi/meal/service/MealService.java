@@ -1,6 +1,8 @@
 package com.fourspoons.mikkureomi.meal.service;
 
 
+import com.fourspoons.mikkureomi.dailyReport.domain.DailyReport;
+import com.fourspoons.mikkureomi.dailyReport.service.DailyReportService;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
@@ -23,6 +25,28 @@ import java.util.stream.Collectors;
 public class MealService {
 
     private final MealRepository mealRepository;
+    private final DailyReportService dailyReportService;
+
+    @Transactional
+    public Meal createMeal(Long profileId) {
+
+        LocalDate today = LocalDate.now();
+
+        // 1. DailyReport 조회/생성 및 Meal 연동
+        DailyReport dailyReport = dailyReportService.getOrCreateDailyReport(profileId, today);
+
+        // 2. Meal 생성 및 저장
+        Meal newMeal = Meal.builder()
+                .dailyReport(dailyReport)
+                .build();
+        Meal savedMeal = mealRepository.save(newMeal);
+
+
+        // 3. DailyReport score/comment 업데이트
+        dailyReportService.updateReportOnNewMeal(dailyReport);
+
+        return savedMeal;
+    }
 
     // 추가 기능 1: MealId로 상세 조회 (연관관계 포함)
     public MealResponseDto getMealDetailById(Long mealId) {
@@ -47,16 +71,6 @@ public class MealService {
                 .collect(Collectors.toList());
     }
 
-    /** 1. 식사 등록 (Create) */
-    @Transactional
-    public MealResponseDto createMeal(MealRequestDto requestDto) {
-        Meal meal = Meal.builder()
-                .build();
-
-        Meal savedMeal = mealRepository.save(meal);
-
-        return new MealResponseDto(savedMeal);
-    }
 
     /** 2. 특정 식사 조회 (Read One) */
     public MealResponseDto getMeal(Long mealId) {
