@@ -40,6 +40,10 @@ public class Restaurant extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "restaurant_type")
+    private RestaurantType restaurantType;
+
     private String phone; // 전화번호
     private String zipCode; // 가맹점우편번호
     private String address; // 주소
