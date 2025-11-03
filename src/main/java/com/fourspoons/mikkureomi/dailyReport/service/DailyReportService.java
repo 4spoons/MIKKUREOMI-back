@@ -35,7 +35,7 @@ public class DailyReportService {
 
     // 2. 단일 DailyReport 삭제 (Delete One)
     @Transactional
-    public void deleteDailyReport(Long dailyReportId, Long currentProfileId) {
+    public void deleteDailyReport(Long dailyReportId, Long profileId) {
         DailyReport report = dailyReportRepository.findById(dailyReportId)
                 .orElseThrow(() -> new EntityNotFoundException("DailyReport not found with id: " + dailyReportId));
 
@@ -43,7 +43,7 @@ public class DailyReportService {
         Long reportOwnerProfileId = report.getProfile().getProfileId();
 
         // ID가 다르면 권한 없음 예외 발생
-        if (!reportOwnerProfileId.equals(currentProfileId)) {
+        if (!reportOwnerProfileId.equals(profileId)) {
             throw new AccessDeniedException("You do not have permission to delete this DailyReport.");
         }
 
