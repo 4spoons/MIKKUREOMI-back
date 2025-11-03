@@ -25,7 +25,11 @@ public enum ResponseMessage {
     GET_PICTURE_SUCCESS("사진 조회가 완료되었습니다"),
 
     // Meal
-    GET_MEAL_SUCCESS("식사 정보 조회가 완료되었습니다.");
+    GET_MEAL_SUCCESS("식사 정보 조회가 완료되었습니다."),
+
+    // DailyReport
+    GET_DAILY_REPORT_SUCCESS("데일리 리포트 조회가 완료되었습니다."),
+    DELETE_DAILY_REPORT_SUCCESS("데일리 리포트가 삭제되었습니다.");
 
 
     private final String message;

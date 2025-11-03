@@ -3,12 +3,11 @@ package com.fourspoons.mikkureomi.dailyReport.service;
 import com.fourspoons.mikkureomi.dailyReport.domain.DailyReport;
 import com.fourspoons.mikkureomi.dailyReport.dto.response.DailyReportResponseDto;
 import com.fourspoons.mikkureomi.dailyReport.repository.DailyReportRepository;
+import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +25,7 @@ public class DailyReportService {
      */
     public DailyReportResponseDto getDailyReportByDate(Long profileId, LocalDate date) {
         DailyReport report = dailyReportRepository.findByProfile_ProfileIdAndDate(profileId, date)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("DailyReport not found for profileId: %d and date: %s", profileId, date)));
+                .orElseThrow(() -> new CustomException(ErrorMessage.DAILY_REPORT_NOT_FOUND));
 
         // DTO 변환 시 연결된 Meal 목록도 함께 로딩됨
         return new DailyReportResponseDto(report);
@@ -37,14 +35,14 @@ public class DailyReportService {
     @Transactional
     public void deleteDailyReport(Long dailyReportId, Long profileId) {
         DailyReport report = dailyReportRepository.findById(dailyReportId)
-                .orElseThrow(() -> new EntityNotFoundException("DailyReport not found with id: " + dailyReportId));
+                .orElseThrow(() -> new CustomException(ErrorMessage.DAILY_REPORT_NOT_FOUND));
 
         // 작성자 ID와 현재 사용자 ID 비교
         Long reportOwnerProfileId = report.getProfile().getProfileId();
 
         // ID가 다르면 권한 없음 예외 발생
         if (!reportOwnerProfileId.equals(profileId)) {
-            throw new AccessDeniedException("You do not have permission to delete this DailyReport.");
+            throw new CustomException(ErrorMessage.ACCESS_DENIED);
         }
 
         dailyReportRepository.delete(report);
@@ -61,7 +59,7 @@ public class DailyReportService {
     private DailyReport createNewDailyReport(Long profileId, LocalDate date) {
 
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.PROFILE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new CustomException(ErrorMessage.PROFILE_NOT_FOUND));
 
         DailyReport newReport = DailyReport.builder()
                 .profile(profile)
