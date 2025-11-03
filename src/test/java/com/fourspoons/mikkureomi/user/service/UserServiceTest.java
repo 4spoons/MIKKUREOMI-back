@@ -1,13 +1,10 @@
 package com.fourspoons.mikkureomi.user.service;
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.jwt.JwtTokenProvider;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
 import com.fourspoons.mikkureomi.user.domain.User;
-import com.fourspoons.mikkureomi.user.dto.LoginRequestDto;
-import com.fourspoons.mikkureomi.user.dto.LoginResponseDto;
-import com.fourspoons.mikkureomi.user.dto.SignUpRequestDto;
-import com.fourspoons.mikkureomi.user.dto.UpdatePasswordRequestDto;
+import com.fourspoons.mikkureomi.user.dto.*;
 import com.fourspoons.mikkureomi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +49,7 @@ class UserServiceTest {
         dto.setEmail("miku@example.com");
         dto.setPassword("password123");
         dto.setNickname("미꾸");
-        dto.setAge(16);
+        dto.setBirthYear(2010);
 
         given(userRepository.existsByEmail(dto.getEmail())).willReturn(false);
         given(passwordEncoder.encode(anyString())).willReturn("encoded-password");
@@ -208,16 +205,22 @@ class UserServiceTest {
     void deleteUser_success() {
         // given
         Long userId = 1L;
+        String rawPassword = "mypassword";
+        String encodedPassword = "encoded";
+
         User user = User.builder()
                 .userId(userId)
                 .email("test@example.com")
-                .password("encoded")
+                .password(encodedPassword)
                 .build();
 
+        PasswordRequestDto requestDto = new PasswordRequestDto(rawPassword);
+
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(rawPassword, encodedPassword)).willReturn(true);
 
         // when
-        userService.deleteUser(userId);
+        userService.deleteUser(userId, requestDto);
 
         // then
         then(profileService).should(times(1)).deleteProfile(userId);
@@ -229,14 +232,46 @@ class UserServiceTest {
     void deleteUser_userNotFound() {
         // given
         Long userId = 999L;
+        PasswordRequestDto requestDto = new PasswordRequestDto("password");
+
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> userService.deleteUser(userId))
+        assertThatThrownBy(() -> userService.deleteUser(userId, requestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("사용자를 찾을 수 없습니다.");
 
         then(profileService).shouldHaveNoInteractions();
         then(userRepository).should(never()).delete(any());
     }
+
+    @Test
+    @DisplayName("회원 탈퇴 실패 - 비밀번호 불일치")
+    void deleteUser_wrongPassword() {
+        // given
+        Long userId = 1L;
+        String rawPassword = "wrongpassword";
+        String encodedPassword = "encoded";
+
+        User user = User.builder()
+                .userId(userId)
+                .email("test@example.com")
+                .password(encodedPassword)
+                .build();
+
+        PasswordRequestDto requestDto = new PasswordRequestDto(rawPassword);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(rawPassword, encodedPassword)).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(userId, requestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("비밀번호가 일치하지 않습니다.");
+
+        then(profileService).shouldHaveNoInteractions();
+        then(userRepository).should(never()).delete(any());
+    }
+
+
 }

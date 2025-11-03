@@ -1,5 +1,6 @@
 package com.fourspoons.mikkureomi.profile.domain;
 
+import com.fourspoons.mikkureomi.common.BaseTimeEntity;
 import com.fourspoons.mikkureomi.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Profile {
+public class Profile extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profile_id", updatable = false, nullable = false)
@@ -33,18 +34,11 @@ public class Profile {
     private Gender gender;
 
     @Column(nullable = false)
-    private int age;
+    private int birthYear;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime modifiedAt;
-
-    public void update(String nickname, int age, Gender gender) {
+    public void update(String nickname, int birthYear, Gender gender) {
         this.nickname = nickname;
-        this.age = age;
+        this.birthYear = birthYear;
         this.gender = gender;
-        this.modifiedAt = LocalDateTime.now();
     }
 }

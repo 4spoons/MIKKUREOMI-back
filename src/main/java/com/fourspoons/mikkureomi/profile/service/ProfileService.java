@@ -1,6 +1,6 @@
 package com.fourspoons.mikkureomi.profile.service;
 
-import com.fourspoons.mikkureomi.constants.ErrorMessage;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
 import com.fourspoons.mikkureomi.profile.dto.ProfileUpdateRequestDto;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +22,8 @@ public class ProfileService {
     public void save(SignUpRequestDto dto, User user) {
         Profile profile = Profile.builder()
                 .user(user)
-                .age(dto.getAge())
+                .birthYear(dto.getBirthYear())
                 .gender(dto.getGender())
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
                 .nickname(dto.getNickname())
                 .build();
 
@@ -44,7 +41,7 @@ public class ProfileService {
         Profile profile = profileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 프로필을 찾을 수 없습니다."));
 
-        profile.update(dto.getNickname(), dto.getAge(), dto.getGender());
+        profile.update(dto.getNickname(), dto.getBirthYear(), dto.getGender());
         return ProfileResponseDto.from(profile);
     }
 

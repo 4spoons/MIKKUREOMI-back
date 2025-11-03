@@ -10,13 +10,13 @@ import lombok.*;
 @AllArgsConstructor
 public class ProfileResponseDto {
     private String nickname;
-    private int age;
+    private int birthYear;
     private Gender gender;
 
     public static ProfileResponseDto from(Profile profile) {
         return ProfileResponseDto.builder()
                 .nickname(profile.getNickname())
-                .age(profile.getAge())
+                .birthYear(profile.getBirthYear())
                 .gender(profile.getGender())
                 .build();
     }
