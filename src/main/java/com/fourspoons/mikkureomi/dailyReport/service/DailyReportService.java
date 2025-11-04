@@ -5,6 +5,7 @@ import com.fourspoons.mikkureomi.dailyReport.dto.response.DailyReportResponseDto
 import com.fourspoons.mikkureomi.dailyReport.repository.DailyReportRepository;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -79,5 +80,11 @@ public class DailyReportService {
         String newComment = String.format("총 XX개의 식사가 기록되었습니다. 잘하고 있어요!");
 
         report.updateReport(newScore, newComment);
+    }
+
+    @Transactional
+    public void accumulateNutrients(DailyReport report, MealNutrientSummary summary) {
+        report.addNutrients(summary);
+        // 변경 감지로 저장됩니다.
     }
 }

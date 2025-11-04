@@ -1,6 +1,7 @@
 package com.fourspoons.mikkureomi.mealPicture.service;
 
 import com.fourspoons.mikkureomi.aws.AwsS3Service;
+import com.fourspoons.mikkureomi.dailyReport.service.DailyReportService;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
@@ -8,7 +9,9 @@ import com.fourspoons.mikkureomi.meal.service.MealService;
 import com.fourspoons.mikkureomi.mealFood.domain.MealFood;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import com.fourspoons.mikkureomi.mealFood.repository.MealFoodRepository;
+import com.fourspoons.mikkureomi.mealFood.service.MealFoodService;
 import com.fourspoons.mikkureomi.mealPicture.domain.MealPicture;
 import com.fourspoons.mikkureomi.mealPicture.dto.request.MealFinalSaveRequestDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.request.MealPictureRequestDto;
@@ -34,6 +37,8 @@ public class MealPictureService {
     private final MealFoodRepository mealFoodRepository;
     private final AwsS3Service awsS3Service;
     private final MealService mealService;
+    private final MealFoodService mealFoodService;
+    private final DailyReportService dailyReportService;
 
     /** 1-1. 사진 URL을 받아 인식된 음식 목록을 반환합니다. (저장 로직 없음) */
     public List<RecognizedFoodResponseDto> recognizeFoodsFromPicture(MultipartFile imageFile) {
@@ -54,11 +59,14 @@ public class MealPictureService {
     @Transactional
     public List<MealFoodResponseDto> saveFinalMealComposition(Long profileId, MultipartFile imageFile, MealFinalSaveRequestDto requestDto) {
 
+        // 0. MealFood의 영양 성분 합계 계산
+        MealNutrientSummary nutrientSummary = mealFoodService.getSummaryOfMealFoods(requestDto.getMealFoodList());
+
         // 1. S3에 파일 업로드 및 URL 획득
         String imageUrl = awsS3Service.upload(imageFile);
 
         // 2. Meal 생성 및 저장
-        Meal newMeal = mealService.createMeal(profileId);
+        Meal newMeal = mealService.createMeal(profileId, nutrientSummary);
 
         // 3. MealPicture 생성 및 저장
         MealPicture mealPicture = MealPicture.builder()
@@ -78,6 +86,7 @@ public class MealPictureService {
                         .protein(foodDto.getProtein())
                         .fat(foodDto.getFat())
                         .sugars(foodDto.getSugars())
+                        .sodium(foodDto.getSodium())
                         .meal(newMeal)
                         .build())
                 .collect(Collectors.toList());

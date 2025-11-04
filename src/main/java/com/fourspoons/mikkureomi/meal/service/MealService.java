@@ -9,6 +9,7 @@ import com.fourspoons.mikkureomi.meal.domain.Meal;
 import com.fourspoons.mikkureomi.meal.dto.request.MealRequestDto;
 import com.fourspoons.mikkureomi.meal.dto.response.MealResponseDto;
 import com.fourspoons.mikkureomi.meal.repository.MealRepository;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class MealService {
     private final DailyReportService dailyReportService;
 
     @Transactional
-    public Meal createMeal(Long profileId) {
+    public Meal createMeal(Long profileId, MealNutrientSummary nutrientSummary) {
 
         LocalDate today = LocalDate.now();
 
@@ -42,7 +43,8 @@ public class MealService {
         Meal savedMeal = mealRepository.save(newMeal);
 
 
-        // 3. DailyReport score/comment 업데이트
+        // 3. DailyReport 누적 영양 성분, score/comment 업데이트
+        dailyReportService.accumulateNutrients(dailyReport, nutrientSummary);
         dailyReportService.updateReportOnNewMeal(dailyReport);
 
         return savedMeal;

@@ -3,10 +3,12 @@ package com.fourspoons.mikkureomi.dailyReport.domain;
 
 import com.fourspoons.mikkureomi.common.BaseTimeEntity;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,35 @@ public class DailyReport extends BaseTimeEntity {
     @Column(name = "comment", length = 500)
     private String comment;
 
+    @Column(name = "daily_calories")
+    @Builder.Default
+    private BigDecimal dailyCalories = BigDecimal.ZERO;
+
+    @Column(name = "daily_carbohydrates")
+    @Builder.Default
+    private BigDecimal dailyCarbohydrates = BigDecimal.ZERO;
+
+    @Column(name = "daily_dietary_fiber")
+    @Builder.Default
+    private BigDecimal dailyDietaryFiber = BigDecimal.ZERO;
+
+    @Column(name = "daily_protein")
+    @Builder.Default
+    private BigDecimal dailyProtein = BigDecimal.ZERO;
+
+    @Column(name = "daily_fat")
+    @Builder.Default
+    private BigDecimal dailyFat = BigDecimal.ZERO;
+
+    @Column(name = "daily_sugars")
+    @Builder.Default
+    private BigDecimal dailySugars = BigDecimal.ZERO;
+
+    @Column(name = "daily_sodium")
+    @Builder.Default
+    private BigDecimal dailySodium = BigDecimal.ZERO;
+
+
     // DailyReport <-> Meal (1:N 관계, DailyReport가 1)
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -49,6 +80,16 @@ public class DailyReport extends BaseTimeEntity {
     public void updateReport(Integer newScore, String newComment) {
         this.score = newScore;
         this.comment = newComment;
+    }
+
+    public void addNutrients(MealNutrientSummary summary) {
+        this.dailyCalories = this.dailyCalories.add(summary.getTotalCalories());
+        this.dailyCarbohydrates = this.dailyCarbohydrates.add(summary.getTotalCarbohydrates());
+        this.dailyDietaryFiber = this.dailyDietaryFiber.add(summary.getTotalDietaryFiber());
+        this.dailyProtein = this.dailyProtein.add(summary.getTotalProtein());
+        this.dailyFat = this.dailyFat.add(summary.getTotalFat());
+        this.dailySugars = this.dailySugars.add(summary.getTotalSugars());
+        this.dailySodium = this.dailySodium.add(summary.getTotalSodium());
     }
 
 }

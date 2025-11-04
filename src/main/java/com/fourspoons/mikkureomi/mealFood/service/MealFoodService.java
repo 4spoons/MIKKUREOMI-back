@@ -5,14 +5,15 @@ import com.fourspoons.mikkureomi.meal.service.MealService;
 import com.fourspoons.mikkureomi.mealFood.domain.MealFood;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealCreateRequestDto;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
-import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodListResponse;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import com.fourspoons.mikkureomi.mealFood.repository.MealFoodRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +30,11 @@ public class MealFoodService {
     @Transactional
     public List<MealFoodResponseDto> createMealWithFoods(Long profileId, MealCreateRequestDto requestDto) {
 
+        // 0. MealFood의 영양 성분 합계 계산
+        MealNutrientSummary nutrientSummary = getSummaryOfMealFoods(requestDto.getMealFoodList());
+
         // 1. Meal 생성 및 저장
-        Meal newMeal = mealService.createMeal(profileId);
+        Meal newMeal = mealService.createMeal(profileId, nutrientSummary);
 
         // 2. MealFood 목록을 엔티티로 변환 및 저장
         List<MealFood> mealFoods = requestDto.getMealFoodList().stream()
@@ -57,18 +61,36 @@ public class MealFoodService {
                 .collect(Collectors.toList());
     }
 
-    /** 2. 특정 식사에 속한 음식 목록 조회 (Read List by Meal ID) */
-    public MealFoodListResponse getMealFoodsByMealId(Long profileId, Long mealId) {
-        mealService.checkAccessToMeal(profileId, mealId);
+    public MealNutrientSummary getSummaryOfMealFoods(List<MealFoodRequestDto> foodDtos) {
 
-        List<MealFood> mealFoods = mealFoodRepository.findAllByMeal_MealId(mealId);
+        // 초기값 설정
+        BigDecimal totalCalories = BigDecimal.ZERO;
+        BigDecimal totalCarbohydrates = BigDecimal.ZERO;
+        BigDecimal totalDietaryFiber = BigDecimal.ZERO;
+        BigDecimal totalProtein = BigDecimal.ZERO;
+        BigDecimal totalFat = BigDecimal.ZERO;
+        BigDecimal totalSugars = BigDecimal.ZERO;
+        BigDecimal totalSodium = BigDecimal.ZERO;
 
-        List<MealFoodResponseDto> mealFoodDtos = mealFoods.stream()
-                .map(MealFoodResponseDto::new)
-                .collect(Collectors.toList());
+        for (MealFoodRequestDto dto : foodDtos) {
+            totalCalories = totalCalories.add(dto.getCalories() != null ? dto.getCalories() : BigDecimal.ZERO);
+            totalCarbohydrates = totalCarbohydrates.add(dto.getCarbohydrates() != null ? dto.getCarbohydrates() : BigDecimal.ZERO);
+            totalDietaryFiber = totalDietaryFiber.add(dto.getDietaryFiber() != null ? dto.getDietaryFiber() : BigDecimal.ZERO);
+            totalProtein = totalProtein.add(dto.getProtein() != null ? dto.getProtein() : BigDecimal.ZERO);
+            totalFat = totalFat.add(dto.getFat() != null ? dto.getFat() : BigDecimal.ZERO);
+            totalSugars = totalSugars.add(dto.getSugars() != null ? dto.getSugars() : BigDecimal.ZERO);
+            totalSodium = totalSodium.add(dto.getSodium() != null ? dto.getSodium() : BigDecimal.ZERO);
+        }
 
-        // Wrapper DTO에 목록과 개수를 담아 반환
-        return new MealFoodListResponse(mealFoodDtos.size(), mealFoodDtos);
+        return MealNutrientSummary.builder()
+                .totalCalories(totalCalories)
+                .totalCarbohydrates(totalCarbohydrates)
+                .totalDietaryFiber(totalDietaryFiber)
+                .totalProtein(totalProtein)
+                .totalFat(totalFat)
+                .totalSugars(totalSugars)
+                .totalSodium(totalSodium)
+                .build();
     }
 
     /** 3. 특정 MealFood 단일 수정 (Update) */

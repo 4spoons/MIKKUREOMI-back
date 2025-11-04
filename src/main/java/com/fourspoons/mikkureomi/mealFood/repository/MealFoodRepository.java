@@ -9,6 +9,4 @@ import java.util.List;
 @Repository
 public interface MealFoodRepository extends JpaRepository<MealFood, Long> {
 
-    // 특정 Meal에 연결된 모든 MealFood를 조회
-    List<MealFood> findAllByMeal_MealId(Long mealId);
 }

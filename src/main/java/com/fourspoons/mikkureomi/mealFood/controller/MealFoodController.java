@@ -3,7 +3,6 @@ package com.fourspoons.mikkureomi.mealFood.controller;
 
 import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
 import com.fourspoons.mikkureomi.mealFood.dto.request.MealCreateRequestDto;
-import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodListResponse;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
 import com.fourspoons.mikkureomi.mealFood.service.MealFoodService;
 import com.fourspoons.mikkureomi.profile.service.ProfileService;
@@ -31,14 +30,6 @@ public class MealFoodController {
         Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());
         List<MealFoodResponseDto> responseList = mealFoodService.createMealWithFoods(profileId, requestDto);
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.CREATE_MEAL_FOOD_SUCCESS.getMessage(), responseList)); // 201 Created
-    }
-
-    /** 2. 특정 Meal에 속한 MealFood 목록 조회 (GET List by Meal ID) */
-    @GetMapping("/by-meal/{mealId}")
-    public ResponseEntity<ApiResponse<MealFoodListResponse>> getMealFoodsByMealId(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long mealId) {
-        Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());
-        MealFoodListResponse response = mealFoodService.getMealFoodsByMealId(profileId, mealId);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_MEAL_FOODS_SUCCESS.getMessage(), response)); // 200 OK
     }
 
 //    /** 3. 특정 MealFood 단일 수정 (PUT) */
