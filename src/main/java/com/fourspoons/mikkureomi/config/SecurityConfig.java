@@ -97,6 +97,10 @@ public class SecurityConfig {
                         // [1순위] OPTIONS (Preflight) 요청은 인증 여부와 관계없이 모두 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        // 지도 조회 페이지는 로그인 없이도 접근 가능
+                        .requestMatchers("/api/restaurants/nearby").permitAll()
+                        .requestMatchers("/api/restaurants/nearby/specific").permitAll()
+
                         // [2순위] 회원가입, 로그인 API는 인증 없이 접근 허용
                         .requestMatchers(HttpMethod.POST, "/api/users/signup", "/api/users/login").permitAll()
 
