@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -86,5 +87,17 @@ public class DailyReportService {
     public void accumulateNutrients(DailyReport report, MealNutrientSummary summary) {
         report.addNutrients(summary);
         // 변경 감지로 저장됩니다.
+    }
+
+    // 특정 월에 DailyReport가 존재하는 모든 날짜를 반환
+    public List<LocalDate> getReportDatesByMonth(Long profileId, int year, int month) {
+
+        if (month < 1 || month > 12) {
+            // 월(month) 값이 유효하지 않을 경우 예외 처리
+            throw new CustomException(ErrorMessage.INVALID_INPUT_VALUE);
+        }
+
+        return dailyReportRepository.findReportDatesByProfileIdAndYearAndMonth(
+                profileId, year, month);
     }
 }
