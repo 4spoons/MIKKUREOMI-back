@@ -32,7 +32,7 @@ public class DailyReport extends BaseTimeEntity {
     // @JoinColumn(name = "monthlyReportId") // 월간 리포트는 나중에 구현
     // private MonthlyReport monthlyReport;
 
-    @Column(name = "date", nullable = false, unique = true) // 하루에 하나만 가능 (실제 DB에서는 profileId와 복합 유니크 키로 설정 권장)
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @Column(name = "score", nullable = false)

@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
         HttpStatus status = switch (error) {
             case EMAIL_ALREADY_EXISTS -> HttpStatus.CONFLICT;        // 409
             case INVALID_PASSWORD -> HttpStatus.UNAUTHORIZED;        // 401
-            case USER_NOT_FOUND, PROFILE_NOT_FOUND, MEAL_PICTURE_NOT_FOUND -> HttpStatus.NOT_FOUND; // 404
+            case USER_NOT_FOUND, PROFILE_NOT_FOUND, MEAL_PICTURE_NOT_FOUND, MEAL_NOT_FOUND -> HttpStatus.NOT_FOUND; // 404
+            case ACCESS_DENIED -> HttpStatus.FORBIDDEN;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
 

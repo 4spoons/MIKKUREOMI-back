@@ -43,6 +43,7 @@ public class MealFoodService {
                         .protein(foodDto.getProtein())
                         .fat(foodDto.getFat())
                         .sugars(foodDto.getSugars())
+                        .sodium(foodDto.getSodium())
                         .meal(newMeal) // 생성된 Meal과 연결
                         .build())
                 .collect(Collectors.toList());

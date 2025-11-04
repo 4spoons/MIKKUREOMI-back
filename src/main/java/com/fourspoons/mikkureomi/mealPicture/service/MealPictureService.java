@@ -46,7 +46,7 @@ public class MealPictureService {
                 .map(dto -> new RecognizedFoodResponseDto(
                         dto.getFoodName(), dto.getQuantity(), dto.getCalories(),
                         dto.getCarbohydrates(), dto.getDietaryFiber(),
-                        dto.getProtein(), dto.getFat(), dto.getSugars()))
+                        dto.getProtein(), dto.getFat(), dto.getSugars(), dto.getSodium()))
                 .collect(Collectors.toList());
     }
 
@@ -132,12 +132,12 @@ public class MealPictureService {
         // Dummy 1: 샐러드
         MealFoodRequestDto salad = new MealFoodRequestDto("샐러드", new BigDecimal("1"), new BigDecimal("180"),
                 new BigDecimal("15"), new BigDecimal("5"),
-                new BigDecimal("10"), new BigDecimal("10"), new BigDecimal("5"));
+                new BigDecimal("10"), new BigDecimal("10"), new BigDecimal("5"), new BigDecimal("4"));
 
         // Dummy 2: 닭가슴살
         MealFoodRequestDto chicken = new MealFoodRequestDto("닭가슴살", new BigDecimal("1"), new BigDecimal("150"),
                 new BigDecimal("0"), new BigDecimal("0"),
-                new BigDecimal("30"), new BigDecimal("3"), new BigDecimal("0"));
+                new BigDecimal("30"), new BigDecimal("3"), new BigDecimal("0"), new BigDecimal("2"));
 
         return List.of(salad, chicken);
     }
