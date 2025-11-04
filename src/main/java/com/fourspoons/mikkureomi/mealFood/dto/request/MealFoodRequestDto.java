@@ -21,4 +21,5 @@ public class MealFoodRequestDto {
     private BigDecimal protein;
     private BigDecimal fat;
     private BigDecimal sugars;
+    private BigDecimal sodium;
 }

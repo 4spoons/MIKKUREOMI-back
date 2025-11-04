@@ -50,6 +50,9 @@ public class MealFood extends BaseTimeEntity {
     @Column(name = "sugars")
     private BigDecimal sugars;
 
+    @Column(name = "sodium")
+    private BigDecimal sodium;
+
     public void update(MealFoodRequestDto requestDto) {
         this.foodName = requestDto.getFoodName();
         this.quantity = requestDto.getQuantity();
@@ -59,5 +62,6 @@ public class MealFood extends BaseTimeEntity {
         this.protein = requestDto.getProtein();
         this.fat = requestDto.getFat();
         this.sugars = requestDto.getSugars();
+        this.sodium = requestDto.getSodium();
     }
 }

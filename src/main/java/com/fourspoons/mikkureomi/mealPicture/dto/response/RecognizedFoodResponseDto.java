@@ -17,4 +17,5 @@ public class RecognizedFoodResponseDto {
     private final BigDecimal protein;
     private final BigDecimal fat;
     private final BigDecimal sugars;
+    private final BigDecimal sodium;
 }

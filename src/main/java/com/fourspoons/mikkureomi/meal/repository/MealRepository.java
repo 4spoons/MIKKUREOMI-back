@@ -14,9 +14,10 @@ public interface MealRepository extends JpaRepository<Meal, Long> {
     @Query("SELECT m FROM Meal m " +
             "LEFT JOIN FETCH m.mealPicture mp " +
             "LEFT JOIN FETCH m.mealFoods mf " +
-            "WHERE m.createdAt BETWEEN :startOfDay AND :endOfNextDay " +
+            "WHERE (m.createdAt BETWEEN :startOfDay AND :endOfNextDay) AND (m.dailyReport.profile.profileId = :profileId)" +
             "ORDER BY m.createdAt ASC")
     List<Meal> findMealsWithDetailsByDateRange(
             @Param("startOfDay") LocalDateTime startOfDay,
-            @Param("endOfNextDay") LocalDateTime endOfNextDay);
+            @Param("endOfNextDay") LocalDateTime endOfNextDay,
+            @Param("profileId") Long profileId);
 }

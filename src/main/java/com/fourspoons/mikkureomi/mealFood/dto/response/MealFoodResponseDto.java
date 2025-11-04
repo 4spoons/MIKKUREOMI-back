@@ -19,6 +19,7 @@ public class MealFoodResponseDto {
     private final BigDecimal protein;
     private final BigDecimal fat;
     private final BigDecimal sugars;
+    private final BigDecimal sodium;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
@@ -33,6 +34,7 @@ public class MealFoodResponseDto {
         this.protein = mealFood.getProtein();
         this.fat = mealFood.getFat();
         this.sugars = mealFood.getSugars();
+        this.sodium = mealFood.getSodium();
         this.createdAt = mealFood.getCreatedAt();
         this.modifiedAt = mealFood.getModifiedAt();
     }
