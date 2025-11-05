@@ -29,8 +29,10 @@ public enum ResponseMessage {
 
     // DailyReport
     GET_DAILY_REPORT_SUCCESS("데일리 리포트 조회가 완료되었습니다."),
-    DELETE_DAILY_REPORT_SUCCESS("데일리 리포트가 삭제되었습니다.");
+    DELETE_DAILY_REPORT_SUCCESS("데일리 리포트가 삭제되었습니다."),
 
-
+    // Recommendation
+    RECOMMENDATION_FETCH_SUCCESS("영양성분 권장섭취량 조회가 완료되었습니다.");
+    
     private final String message;
 }
