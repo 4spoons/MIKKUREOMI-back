@@ -29,7 +29,11 @@ public enum ResponseMessage {
 
     // DailyReport
     GET_DAILY_REPORT_SUCCESS("데일리 리포트 조회가 완료되었습니다."),
-    DELETE_DAILY_REPORT_SUCCESS("데일리 리포트가 삭제되었습니다.");
+    DELETE_DAILY_REPORT_SUCCESS("데일리 리포트가 삭제되었습니다."),
+
+    // Food
+    SYNC_DATA_SUCCESS("공공데이터 동기화가 완료되었습니다."),
+    SEARCH_FOOD_SUCCESS("음식 검색이 완료되었습니다.");
 
 
     private final String message;
