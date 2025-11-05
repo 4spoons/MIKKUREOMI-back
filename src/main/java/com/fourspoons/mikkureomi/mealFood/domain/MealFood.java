@@ -2,7 +2,6 @@ package com.fourspoons.mikkureomi.mealFood.domain;
 
 import com.fourspoons.mikkureomi.common.BaseTimeEntity;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
-import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -53,15 +52,4 @@ public class MealFood extends BaseTimeEntity {
     @Column(name = "sodium")
     private BigDecimal sodium;
 
-    public void update(MealFoodRequestDto requestDto) {
-        this.foodName = requestDto.getFoodName();
-        this.quantity = requestDto.getQuantity();
-        this.calories = requestDto.getCalories();
-        this.carbohydrates = requestDto.getCarbohydrates();
-        this.dietaryFiber = requestDto.getDietaryFiber();
-        this.protein = requestDto.getProtein();
-        this.fat = requestDto.getFat();
-        this.sugars = requestDto.getSugars();
-        this.sodium = requestDto.getSodium();
-    }
 }

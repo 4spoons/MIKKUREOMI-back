@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,27 @@ public class FoodService {
                 .foods(foodList)
                 .build();
     }
+
+    private BigDecimal calNutri(BigDecimal valuePer100g, BigDecimal foodSize, BigDecimal quantity) {
+        if (valuePer100g == null) return BigDecimal.ZERO;
+        if (quantity == null) quantity = BigDecimal.ONE;
+
+        // 1) gramsConsumed 결정
+        BigDecimal gramsConsumed;
+        if (foodSize != null && foodSize.compareTo(BigDecimal.ZERO) > 0) {
+            // quantity를 '인분'으로 해석
+            gramsConsumed = foodSize.multiply(quantity);
+        } else {
+            // foodSize 정보가 없으면 1인분=100그램으로 해석 (안전한 기본 처리)
+            gramsConsumed = quantity.multiply(new BigDecimal(100));
+        }
+
+        // 2) 계산: valuePer100g * (gramsConsumed / 100)
+        return valuePer100g
+                .multiply(gramsConsumed)
+                .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+    }
+
 
     // 공공데이터 API 전체 동기화
     public void syncFoodDataFromAPI() {

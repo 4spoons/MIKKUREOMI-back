@@ -1,5 +1,8 @@
 package com.fourspoons.mikkureomi.mealFood.service;
 
+import com.fourspoons.mikkureomi.food.domain.Food;
+import com.fourspoons.mikkureomi.food.repository.FoodRepository;
+import com.fourspoons.mikkureomi.food.service.FoodService;
 import com.fourspoons.mikkureomi.meal.domain.Meal;
 import com.fourspoons.mikkureomi.meal.service.MealService;
 import com.fourspoons.mikkureomi.mealFood.domain.MealFood;
@@ -24,6 +27,8 @@ public class MealFoodService {
 
     private final MealFoodRepository mealFoodRepository;
     private final MealService mealService;
+    private final FoodRepository foodRepository;
+    private final FoodService foodService;
 
 
     /** 1. 식사 (Meal)와 음식 목록 (MealFood) 동시 등록 (Create) */
@@ -38,18 +43,34 @@ public class MealFoodService {
 
         // 2. MealFood 목록을 엔티티로 변환 및 저장
         List<MealFood> mealFoods = requestDto.getMealFoodList().stream()
-                .map(foodDto -> MealFood.builder()
-                        .foodName(foodDto.getFoodName())
-                        .quantity(foodDto.getQuantity())
-                        .calories(foodDto.getCalories())
-                        .carbohydrates(foodDto.getCarbohydrates())
-                        .dietaryFiber(foodDto.getDietaryFiber())
-                        .protein(foodDto.getProtein())
-                        .fat(foodDto.getFat())
-                        .sugars(foodDto.getSugars())
-                        .sodium(foodDto.getSodium())
-                        .meal(newMeal) // 생성된 Meal과 연결
-                        .build())
+                .map(foodDto -> {
+                    Food food = foodRepository.findById(foodDto.getFoodId())
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 음식 ID: " + foodDto.getFoodId()));
+
+                    BigDecimal quantity = foodDto.getQuantity() != null ? foodDto.getQuantity() : BigDecimal.ONE;
+                    BigDecimal foodSize = food.getFoodSize(); // DB에 저장된 1회 제공량 (g) - BigDecimal
+
+                    BigDecimal calories = foodService.calNutri(food.getEnerc(), foodSize, quantity);
+                    BigDecimal carbohydrates = foodService.calNutri(food.getChocdf(), foodSize, quantity);
+                    BigDecimal dietaryFiber = foodService.calNutri(food.getFibtg(), foodSize, quantity);
+                    BigDecimal protein = foodService.calNutri(food.getProt(), foodSize, quantity);
+                    BigDecimal fat = foodService.calNutri(food.getFatce(), foodSize, quantity);
+                    BigDecimal sugars = foodService.calNutri(food.getSugar(), foodSize, quantity);
+                    BigDecimal sodium = foodService.calNutri(food.getNat(), foodSize, quantity);
+
+                    return MealFood.builder()
+                            .foodName(food.getFoodNm())
+                            .quantity(quantity)
+                            .calories(calories)
+                            .carbohydrates(carbohydrates)
+                            .dietaryFiber(dietaryFiber)
+                            .protein(protein)
+                            .fat(fat)
+                            .sugars(sugars)
+                            .sodium(sodium)
+                            .meal(newMeal)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         // 목록 일괄 저장
@@ -73,14 +94,21 @@ public class MealFoodService {
         BigDecimal totalSodium = BigDecimal.ZERO;
 
         for (MealFoodRequestDto dto : foodDtos) {
-            totalCalories = totalCalories.add(dto.getCalories() != null ? dto.getCalories() : BigDecimal.ZERO);
-            totalCarbohydrates = totalCarbohydrates.add(dto.getCarbohydrates() != null ? dto.getCarbohydrates() : BigDecimal.ZERO);
-            totalDietaryFiber = totalDietaryFiber.add(dto.getDietaryFiber() != null ? dto.getDietaryFiber() : BigDecimal.ZERO);
-            totalProtein = totalProtein.add(dto.getProtein() != null ? dto.getProtein() : BigDecimal.ZERO);
-            totalFat = totalFat.add(dto.getFat() != null ? dto.getFat() : BigDecimal.ZERO);
-            totalSugars = totalSugars.add(dto.getSugars() != null ? dto.getSugars() : BigDecimal.ZERO);
-            totalSodium = totalSodium.add(dto.getSodium() != null ? dto.getSodium() : BigDecimal.ZERO);
+            Food food = foodRepository.findById(dto.getFoodId())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 음식 ID: " + dto.getFoodId()));
+
+            BigDecimal quantity = dto.getQuantity() != null ? dto.getQuantity() : BigDecimal.ONE;
+            BigDecimal foodSize = food.getFoodSize();
+
+            totalCalories = totalCalories.add(foodService.calNutri(food.getEnerc(), foodSize, quantity));
+            totalCarbohydrates = totalCarbohydrates.add(foodService.calNutri(food.getChocdf(), foodSize, quantity));
+            totalDietaryFiber = totalDietaryFiber.add(foodService.calNutri(food.getFibtg(), foodSize, quantity));
+            totalProtein = totalProtein.add(foodService.calNutri(food.getProt(), foodSize, quantity));
+            totalFat = totalFat.add(foodService.calNutri(food.getFatce(), foodSize, quantity));
+            totalSugars = totalSugars.add(foodService.calNutri(food.getSugar(), foodSize, quantity));
+            totalSodium = totalSodium.add(foodService.calNutri(food.getNat(), foodSize, quantity));
         }
+
 
         return MealNutrientSummary.builder()
                 .totalCalories(totalCalories)
@@ -94,15 +122,15 @@ public class MealFoodService {
     }
 
     /** 3. 특정 MealFood 단일 수정 (Update) */
-    @Transactional
-    public MealFoodResponseDto updateMealFood(Long mealFoodId, MealFoodRequestDto requestDto) {
-        MealFood mealFood = mealFoodRepository.findById(mealFoodId)
-                .orElseThrow(() -> new EntityNotFoundException("MealFood not found with id: " + mealFoodId));
-
-        mealFood.update(requestDto);
-
-        return new MealFoodResponseDto(mealFood);
-    }
+//    @Transactional
+//    public MealFoodResponseDto updateMealFood(Long mealFoodId, MealFoodRequestDto requestDto) {
+//        MealFood mealFood = mealFoodRepository.findById(mealFoodId)
+//                .orElseThrow(() -> new EntityNotFoundException("MealFood not found with id: " + mealFoodId));
+//
+//        mealFood.update(requestDto);
+//
+//        return new MealFoodResponseDto(mealFood);
+//    }
 
     /** 4. 특정 MealFood 삭제 (Delete) */
     @Transactional
