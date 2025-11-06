@@ -40,9 +40,4 @@ public class Meal extends BaseTimeEntity {
     @JoinColumn(name = "dailyReportId") // dailyReportId 컬럼
     private DailyReport dailyReport;
 
-//    // Setter 지양: 연관관계 설정을 위한 protected 메서드 추가 (MealPictureService에서 사용)
-//    protected void setDailyReport(DailyReport dailyReport) {
-//        this.dailyReport = dailyReport;
-//    }
-
 }

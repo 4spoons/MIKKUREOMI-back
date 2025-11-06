@@ -156,30 +156,4 @@ public class MealPictureService {
         return new MealPictureResponseDto(picture);
     }
 
-    // 3. 특정 MealPicture 조회 (Read One)
-    public MealPictureResponseDto getMealPicture(Long pictureId) {
-        MealPicture picture = mealPictureRepository.findById(pictureId)
-                .orElseThrow(() -> new EntityNotFoundException("MealPicture not found with id: " + pictureId));
-        return new MealPictureResponseDto(picture);
-    }
-
-    // 4. MealPicture 수정 (Update: 주로 URL 변경)
-    @Transactional
-    public MealPictureResponseDto updateMealPicture(Long pictureId, MealPictureRequestDto requestDto) {
-        MealPicture mealPicture = mealPictureRepository.findById(pictureId)
-                .orElseThrow(() -> new EntityNotFoundException("MealPicture not found with id: " + pictureId));
-
-        mealPicture.update(requestDto.getUrl());
-
-        return new MealPictureResponseDto(mealPicture);
-    }
-
-    // 5. MealPicture 삭제 (Delete)
-    @Transactional
-    public void deleteMealPicture(Long pictureId) {
-        MealPicture mealPicture = mealPictureRepository.findById(pictureId)
-                .orElseThrow(() -> new EntityNotFoundException("MealPicture not found with id: " + pictureId));
-
-        mealPictureRepository.delete(mealPicture);
-    }
 }

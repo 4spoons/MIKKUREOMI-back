@@ -38,11 +38,4 @@ public class DailyReportController {
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_DAILY_REPORT_SUCCESS.getMessage(), dates));
     }
 
-    // 3. 단일 DailyReport 삭제
-//    @DeleteMapping("/{dailyReportId}")
-//    public ResponseEntity<ApiResponse<Void>> deleteDailyReport(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long dailyReportId) {
-//        Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());
-//        dailyReportService.deleteDailyReport(dailyReportId, profileId);
-//        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.DELETE_DAILY_REPORT_SUCCESS.getMessage()));
-//    }
 }

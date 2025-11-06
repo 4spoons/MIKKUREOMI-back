@@ -35,23 +35,6 @@ public class DailyReportService {
         return new DailyReportResponseDto(report);
     }
 
-    // 2. 단일 DailyReport 삭제 (Delete One)
-    @Transactional
-    public void deleteDailyReport(Long dailyReportId, Long profileId) {
-        DailyReport report = dailyReportRepository.findById(dailyReportId)
-                .orElseThrow(() -> new CustomException(ErrorMessage.DAILY_REPORT_NOT_FOUND));
-
-        // 작성자 ID와 현재 사용자 ID 비교
-        Long reportOwnerProfileId = report.getProfile().getProfileId();
-
-        // ID가 다르면 권한 없음 예외 발생
-        if (!reportOwnerProfileId.equals(profileId)) {
-            throw new CustomException(ErrorMessage.ACCESS_DENIED);
-        }
-
-        dailyReportRepository.delete(report);
-    }
-
     // MealService에서 호출할 DailyReport 조회/생성 로직
     @Transactional
     public DailyReport getOrCreateDailyReport(Long profileId, LocalDate date) {
