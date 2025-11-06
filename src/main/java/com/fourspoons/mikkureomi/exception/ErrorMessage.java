@@ -33,7 +33,11 @@ public enum ErrorMessage {
     FOOD_NOT_FOUND("해당 음식 정보를 찾을 수 없습니다."),
 
     // --- Server ---
-    INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
+
+    // --- Recommendation ---
+    RECOMMENDED_NUTRIENTS_NOT_FOUND("해당 나이/성별에 대한 권장 영양 기준이 없습니다."),
+    UNSUPPORTED_AGE_RANGE("지원되지 않는 연령대입니다.");
 
     private final String message;
 }

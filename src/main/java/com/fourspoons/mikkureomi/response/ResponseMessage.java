@@ -37,5 +37,8 @@ public enum ResponseMessage {
     GET_FOOD_DETAIL_SUCCESS("음식 정보 조회가 완료되었습니다.");
 
 
+    // Recommendation
+    RECOMMENDATION_FETCH_SUCCESS("영양성분 권장섭취량 조회가 완료되었습니다.");
+    
     private final String message;
 }
