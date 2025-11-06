@@ -43,7 +43,10 @@ public enum ResponseMessage {
     // Notification
     GET_NOTIFICATION_SUCCESS("알림 목록을 성공적으로 조회했습니다."),
     ISREAD_UPDATE_SUCCESS("알림 읽음 상태를 성공적으로 변경했습니다."),
-    REMAINING_MESSAGE_NUMBER_SUCCESS("읽지 않은 알림 개수를 성공적으로 조회했습니다.");
+    REMAINING_MESSAGE_NUMBER_SUCCESS("읽지 않은 알림 개수를 성공적으로 조회했습니다."),
+
+    // DailyReport
+    GET_MONTHLY_REPORT_SUCCESS("데일리 리포트 조회가 완료되었습니다.");
 
 
     private final String message;
