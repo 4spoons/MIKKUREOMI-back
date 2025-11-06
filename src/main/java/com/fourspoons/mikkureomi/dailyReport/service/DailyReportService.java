@@ -10,6 +10,8 @@ import com.fourspoons.mikkureomi.monthlyReport.service.MonthlyReportService;
 import com.fourspoons.mikkureomi.notification.service.NotificationService;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
+import com.fourspoons.mikkureomi.recommendedNutrients.dto.RecommendedNutrientsResponseDto;
+import com.fourspoons.mikkureomi.recommendedNutrients.service.RecommendedNutrientsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,8 @@ public class DailyReportService {
     private final ProfileRepository profileRepository;
     private final MonthlyReportService monthlyReportService;
     private final NotificationService notificationService;
+    private final NutritionScoreCalculator nutritionScoreCalculator;
+    private final RecommendedNutrientsService recommendedNutrientsService;
 
     // 1. 단일 DailyReport 조회 (Read One by Date and Profile
     public DailyReportResponseDto getDailyReportByDate(Long profileId, LocalDate date) {
@@ -65,9 +69,12 @@ public class DailyReportService {
 
     // DailyReport 점수 업데이트 로직 (Meal이 추가될 때마다 호출)
     @Transactional
-    public void updateReportOnNewMeal(DailyReport report) {
+    public void updateReportOnNewMeal(Long profileId, DailyReport report) {
 
-        Integer newScore = Math.min(100, report.getScore() + 10); // 점수 10점씩 증가 (최대 100점)
+        RecommendedNutrientsResponseDto recommendedNutrients = recommendedNutrientsService.getRecommendedNutrients(profileId);
+
+        // 점수 계산
+        Integer newScore = nutritionScoreCalculator.calculateScore(report, recommendedNutrients);
 
         report.updateReport(newScore);
 
@@ -75,7 +82,6 @@ public class DailyReportService {
 
         // 70점 달성시 알림 전송
         if (report.getScore() >= TARGET_SCORE) {
-            Long profileId = report.getProfile().getProfileId(); // DailyReport에서 Profile ID 획득
 
             notificationService.createNotificationLog(
                     profileId,

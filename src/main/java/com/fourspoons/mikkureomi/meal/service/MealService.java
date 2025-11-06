@@ -45,7 +45,7 @@ public class MealService {
 
         // 3. DailyReport 누적 영양 성분, score/comment 업데이트
         dailyReportService.accumulateNutrients(dailyReport, nutrientSummary);
-        dailyReportService.updateReportOnNewMeal(dailyReport);
+        dailyReportService.updateReportOnNewMeal(profileId, dailyReport);
 
         return savedMeal;
     }
