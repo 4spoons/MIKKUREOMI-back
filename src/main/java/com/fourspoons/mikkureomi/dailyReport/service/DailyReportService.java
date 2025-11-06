@@ -6,6 +6,7 @@ import com.fourspoons.mikkureomi.dailyReport.repository.DailyReportRepository;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
+import com.fourspoons.mikkureomi.monthlyReport.service.MonthlyReportService;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class DailyReportService {
 
     private final DailyReportRepository dailyReportRepository;
     private final ProfileRepository profileRepository;
+    private final MonthlyReportService monthlyReportService;
 
     /** * 1. 단일 DailyReport 조회 (Read One by Date and Profile)
      */
@@ -63,6 +65,10 @@ public class DailyReportService {
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new CustomException(ErrorMessage.PROFILE_NOT_FOUND));
 
+        // 1. MonthlyReport 생성/조회 (DailyReport 생성 시점에 해당 월의 MonthlyReport 생성)
+        monthlyReportService.getOrCreateMonthlyReport(profile, date);
+
+        // 2. DailyReport 생성 및 저장
         DailyReport newReport = DailyReport.builder()
                 .profile(profile)
                 .date(date)

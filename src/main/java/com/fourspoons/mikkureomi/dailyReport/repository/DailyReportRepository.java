@@ -25,4 +25,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             @Param("profileId") Long profileId,
             @Param("year") int year,
             @Param("month") int month);
+
+    // 특정 날짜(어제)에 DailyReport가 존재하는 모든 Profile ID를 조회 (월간 리포트 업데이트 대상 유저 찾는 용도)
+    @Query("SELECT DISTINCT dr.profile.profileId FROM DailyReport dr WHERE dr.date = :date")
+    List<Long> findProfileIdsByDate(@Param("date") LocalDate date);
+
+    // 월별 통계 계산을 위한 메서드 (MonthlyReportService에서 필요하다고 가정했던 메서드)
+    @Query("SELECT SIZE(dr.meals), dr.score " +
+            "FROM DailyReport dr " +
+            "WHERE dr.profile.profileId = :profileId AND YEAR(dr.date) = :year AND MONTH(dr.date) = :month")
+    List<Object[]> findMonthlyStatsByProfileIdAndMonth(@Param("profileId") Long profileId, @Param("year") int year, @Param("month") int month);
 }
