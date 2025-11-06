@@ -1,12 +1,16 @@
 package com.fourspoons.mikkureomi.food.service;
 
+import com.fourspoons.mikkureomi.exception.CustomException;
+import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.food.domain.Food;
+import com.fourspoons.mikkureomi.food.dto.response.FoodDetailResponse;
 import com.fourspoons.mikkureomi.food.dto.response.FoodSearchResponse;
 import com.fourspoons.mikkureomi.food.repository.FoodRepository;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,6 +46,14 @@ public class FoodService {
                 .timestamp(LocalDateTime.now())
                 .foods(foodList)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public FoodDetailResponse findFoodById(Long foodId) {
+        Food food = foodRepository.findById(foodId)
+                .orElseThrow(() -> new CustomException(ErrorMessage.FOOD_NOT_FOUND));
+
+        return FoodDetailResponse.from(food);
     }
 
     public BigDecimal calNutri(BigDecimal valuePer100g, BigDecimal foodSize, BigDecimal quantity) {

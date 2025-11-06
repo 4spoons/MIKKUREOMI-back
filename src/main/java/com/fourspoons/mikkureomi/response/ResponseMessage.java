@@ -33,7 +33,8 @@ public enum ResponseMessage {
 
     // Food
     SYNC_DATA_SUCCESS("공공데이터 동기화가 완료되었습니다."),
-    SEARCH_FOOD_SUCCESS("음식 검색이 완료되었습니다.");
+    SEARCH_FOOD_SUCCESS("음식 검색이 완료되었습니다."),
+    GET_FOOD_DETAIL_SUCCESS("음식 정보 조회가 완료되었습니다.");
 
 
     private final String message;

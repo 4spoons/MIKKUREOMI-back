@@ -1,5 +1,6 @@
 package com.fourspoons.mikkureomi.food.controller;
 
+import com.fourspoons.mikkureomi.food.dto.response.FoodDetailResponse;
 import com.fourspoons.mikkureomi.food.dto.response.FoodSearchResponse;
 import com.fourspoons.mikkureomi.food.service.FoodService;
 import com.fourspoons.mikkureomi.response.ApiResponse;
@@ -28,5 +29,15 @@ public class FoodController {
     public ResponseEntity<ApiResponse<FoodSearchResponse>> searchFood(@RequestParam("name") String name) {
         FoodSearchResponse foodList = foodService.searchFoodByName(name);
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.SEARCH_FOOD_SUCCESS.getMessage(), foodList));
+    }
+
+    // Food 조회 bu foodId
+    @GetMapping("/{foodId}")
+    public ResponseEntity<ApiResponse<FoodDetailResponse>> getFoodDetail(@PathVariable("foodId") Long foodId) {
+        FoodDetailResponse foodDetail = foodService.findFoodById(foodId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(ResponseMessage.GET_FOOD_DETAIL_SUCCESS.getMessage(), foodDetail)
+        );
     }
 }
