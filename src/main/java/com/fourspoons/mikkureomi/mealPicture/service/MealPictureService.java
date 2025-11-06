@@ -90,12 +90,8 @@ public class MealPictureService {
 
         MealNutrientSummary totalSummary = MealNutrientSummary.empty();
 
-        // 1. S3에 파일 업로드 및 URL 획득
-        String imageUrl = awsS3Service.upload(imageFile);
-
         // 1. MealFood 목록 계산 및 생성
         List<MealFood> mealFoods = new ArrayList<>();
-
 
         for (MealFoodRequestDto foodDto : requestDto.getMealFoodList()) {
             Food food = foodRepository.findById(foodDto.getFoodId())
@@ -129,14 +125,19 @@ public class MealPictureService {
         // 2. Meal 생성 및 저장
         Meal newMeal = mealService.createMeal(profileId, totalSummary);
 
-        // 3. MealPicture 생성 및 저장
-        MealPicture mealPicture = MealPicture.builder()
-                .imageUrl(imageUrl)
-                .meal(newMeal)
-                .build();
-        mealPictureRepository.save(mealPicture);
+        // 3. MealPicture 생성 및 저장 (파일이 있을 경우에만 수행)
+        if (imageFile != null && !imageFile.isEmpty()) {
 
-        // Meal 연결 후 저장
+            String imageUrl = awsS3Service.upload(imageFile);
+
+            MealPicture mealPicture = MealPicture.builder()
+                    .imageUrl(imageUrl)
+                    .meal(newMeal)
+                    .build();
+            mealPictureRepository.save(mealPicture);
+        }
+
+        // 4. Meal 연결 후 저장
         mealFoods.forEach(mf -> mf.setMeal(newMeal));
         List<MealFood> savedMealFoods = mealFoodRepository.saveAll(mealFoods);
 

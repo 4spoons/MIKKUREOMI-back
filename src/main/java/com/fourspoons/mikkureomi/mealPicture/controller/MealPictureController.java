@@ -36,7 +36,7 @@ public class MealPictureController {
 
     // 1-2. 최종 저장 요청 (Meal, MealPicture, MealFood 모두 저장)
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> saveFinalMeal(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestPart("imageFile") MultipartFile imageFile, @RequestPart("request") MealFinalSaveRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<List<MealFoodResponseDto>>> saveFinalMeal(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestPart(value = "imageFile", required = false) MultipartFile imageFile, @RequestPart("request") MealFinalSaveRequestDto requestDto) {
         Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());
         List<MealFoodResponseDto> responseList =
                 mealPictureService.saveFinalMealComposition(profileId, imageFile, requestDto);
