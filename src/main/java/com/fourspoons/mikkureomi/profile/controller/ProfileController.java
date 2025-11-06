@@ -1,5 +1,6 @@
 package com.fourspoons.mikkureomi.profile.controller;
 
+import com.fourspoons.mikkureomi.profile.dto.ProfileDetailResponseDto;
 import com.fourspoons.mikkureomi.response.ResponseMessage;
 import com.fourspoons.mikkureomi.jwt.CustomUserDetails;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
@@ -22,10 +23,10 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping()
-    public ResponseEntity<ApiResponse<ProfileResponseDto>> getProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<ProfileDetailResponseDto>> getProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getUserId();
-        ProfileResponseDto profileResponseDto = profileService.getProfile(userId);
-        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.PROFILE_FETCH_SUCCESS.getMessage(), profileResponseDto));
+        ProfileDetailResponseDto profileDetailResponseDto = profileService.getProfile(userId, userDetails.getUser().getEmail());
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.PROFILE_FETCH_SUCCESS.getMessage(), profileDetailResponseDto));
     }
 
     @PutMapping()
