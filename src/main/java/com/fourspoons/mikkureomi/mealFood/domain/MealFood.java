@@ -22,7 +22,7 @@ public class MealFood extends BaseTimeEntity {
 
     // Meal과의 다대일 관계 (외래 키 매핑)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meal_id", nullable = false)
+    @JoinColumn(name = "meal_id")
     private Meal meal;
 
     @Column(name = "food_name")
@@ -52,4 +52,7 @@ public class MealFood extends BaseTimeEntity {
     @Column(name = "sodium")
     private BigDecimal sodium;
 
+    public void setMeal(Meal meal) {
+        this.meal = meal;
+    }
 }

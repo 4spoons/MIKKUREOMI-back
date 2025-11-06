@@ -3,6 +3,7 @@ package com.fourspoons.mikkureomi.food.service;
 import com.fourspoons.mikkureomi.food.domain.Food;
 import com.fourspoons.mikkureomi.food.dto.response.FoodSearchResponse;
 import com.fourspoons.mikkureomi.food.repository.FoodRepository;
+import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class FoodService {
                 .build();
     }
 
-    private BigDecimal calNutri(BigDecimal valuePer100g, BigDecimal foodSize, BigDecimal quantity) {
+    public BigDecimal calNutri(BigDecimal valuePer100g, BigDecimal foodSize, BigDecimal quantity) {
         if (valuePer100g == null) return BigDecimal.ZERO;
         if (quantity == null) quantity = BigDecimal.ONE;
 
@@ -61,7 +61,22 @@ public class FoodService {
         // 2) 계산: valuePer100g * (gramsConsumed / 100)
         return valuePer100g
                 .multiply(gramsConsumed)
-                .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+                .divide(new BigDecimal("100"))
+                .setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public MealNutrientSummary calNutriSummary(Food food, BigDecimal quantity) {
+        BigDecimal size = food.getFoodSize();
+
+        return MealNutrientSummary.builder()
+                .calories(calNutri(food.getEnerc(), size, quantity))
+                .carbohydrates(calNutri(food.getChocdf(), size, quantity))
+                .dietaryFiber(calNutri(food.getFibtg(), size, quantity))
+                .protein(calNutri(food.getProt(), size, quantity))
+                .fat(calNutri(food.getFatce(), size, quantity))
+                .sugars(calNutri(food.getSugar(), size, quantity))
+                .sodium(calNutri(food.getNat(), size, quantity))
+                .build();
     }
 
 

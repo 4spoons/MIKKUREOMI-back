@@ -1,6 +1,5 @@
 package com.fourspoons.mikkureomi.food.controller;
 
-import com.fourspoons.mikkureomi.food.domain.Food;
 import com.fourspoons.mikkureomi.food.dto.response.FoodSearchResponse;
 import com.fourspoons.mikkureomi.food.service.FoodService;
 import com.fourspoons.mikkureomi.response.ApiResponse;
@@ -9,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/food")
@@ -27,7 +25,7 @@ public class FoodController {
 
     // 부분 검색
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<Food>>> searchFood(@RequestParam("name") String name) {
+    public ResponseEntity<ApiResponse<FoodSearchResponse>> searchFood(@RequestParam("name") String name) {
         FoodSearchResponse foodList = foodService.searchFoodByName(name);
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.SEARCH_FOOD_SUCCESS.getMessage(), foodList));
     }

@@ -83,13 +83,13 @@ public class DailyReport extends BaseTimeEntity {
     }
 
     public void addNutrients(MealNutrientSummary summary) {
-        this.dailyCalories = this.dailyCalories.add(summary.getTotalCalories());
-        this.dailyCarbohydrates = this.dailyCarbohydrates.add(summary.getTotalCarbohydrates());
-        this.dailyDietaryFiber = this.dailyDietaryFiber.add(summary.getTotalDietaryFiber());
-        this.dailyProtein = this.dailyProtein.add(summary.getTotalProtein());
-        this.dailyFat = this.dailyFat.add(summary.getTotalFat());
-        this.dailySugars = this.dailySugars.add(summary.getTotalSugars());
-        this.dailySodium = this.dailySodium.add(summary.getTotalSodium());
+        this.dailyCalories = this.dailyCalories.add(summary.getCalories());
+        this.dailyCarbohydrates = this.dailyCarbohydrates.add(summary.getCarbohydrates());
+        this.dailyDietaryFiber = this.dailyDietaryFiber.add(summary.getDietaryFiber());
+        this.dailyProtein = this.dailyProtein.add(summary.getProtein());
+        this.dailyFat = this.dailyFat.add(summary.getFat());
+        this.dailySugars = this.dailySugars.add(summary.getSugars());
+        this.dailySodium = this.dailySodium.add(summary.getSodium());
     }
 
 }
