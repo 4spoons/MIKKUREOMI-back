@@ -2,6 +2,7 @@ package com.fourspoons.mikkureomi.profile.service;
 
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
+import com.fourspoons.mikkureomi.profile.dto.ProfileDetailResponseDto;
 import com.fourspoons.mikkureomi.profile.dto.ProfileResponseDto;
 import com.fourspoons.mikkureomi.profile.dto.ProfileUpdateRequestDto;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
@@ -31,10 +32,10 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public ProfileResponseDto getProfile(Long userId) {
+    public ProfileDetailResponseDto getProfile(Long userId, String email) {
         Profile profile = profileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.PROFILE_NOT_FOUND.getMessage()));
-        return ProfileResponseDto.from(profile);
+        return ProfileDetailResponseDto.from(profile, email);
     }
 
     @Transactional(readOnly = true)
