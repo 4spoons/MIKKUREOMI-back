@@ -47,7 +47,7 @@ public class RecommendedNutrientsService {
         return RecommendedNutrientsResponseDto.from(nutrients);
     }
 
-    private Integer getDbAgeKey(int age) {
+    public Integer getDbAgeKey(int age) {
         if (age >= 6 && age <= 8) {
             return 7;
         } else if (age >= 9 && age <= 11) {

@@ -44,10 +44,11 @@ public class MonthlyReport extends BaseTimeEntity {
     private Integer missingDays;
 
     // 월간 리포트 정보 업데이트
-    public void updateReport(Integer score, Integer totalMeals, Integer totalDays, Integer missingDays) {
+    public void updateReport(Integer score, Integer totalMeals, Integer totalDays, Integer missingDays, String comment) {
         this.score = score;
         this.totalMeals = totalMeals;
         this.totalDays = totalDays;
         this.missingDays = missingDays;
+        this.comment = comment;
     }
 }

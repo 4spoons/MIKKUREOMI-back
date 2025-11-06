@@ -30,7 +30,7 @@ public class DailyReportController {
         return ResponseEntity.ok(ApiResponse.success(ResponseMessage.GET_DAILY_REPORT_SUCCESS.getMessage(), responseDto));
     }
 
-    // 2. 특정 월에 DailyReport가 존재하는 날짜 리스트 조회 */
+    // 2. 특정 월에 DailyReport가 존재하는 날짜 리스트 조회
     @GetMapping("/dates")
     public ResponseEntity<ApiResponse<List<LocalDate>>> getReportDatesByYearAndMonth(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam("year") int year, @RequestParam("month") int month) {
         Long profileId = profileService.getProfileId(userDetails.getUser().getUserId());

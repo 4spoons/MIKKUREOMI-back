@@ -30,10 +30,6 @@ public class DailyReport extends BaseTimeEntity {
     @JoinColumn(name = "profileId", nullable = false)
     private Profile profile; // 1:N 관계 (N이 DailyReport)
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "monthlyReportId") // 월간 리포트는 나중에 구현
-    // private MonthlyReport monthlyReport;
-
     @Column(name = "date", nullable = false)
     private LocalDate date;
 

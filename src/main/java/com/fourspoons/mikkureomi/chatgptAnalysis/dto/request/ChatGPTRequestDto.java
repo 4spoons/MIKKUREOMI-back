@@ -38,7 +38,8 @@ public class ChatGPTRequestDto {
 
     public static ChatGPTRequestDto createTextRequest(String model, int maxTokens, String role, String requestText) {
         Message message = new TextMessage(role, requestText);
-        return createChatGPTRequest(model, maxTokens, Collections.singletonList(message), null);
+        ResponseFormat jsonFormat = new ResponseFormat("json_object"); // JSON 형식 강제
+        return createChatGPTRequest(model, maxTokens, Collections.singletonList(message), jsonFormat);
     }
 
     private static ChatGPTRequestDto createChatGPTRequest(String model, int maxTokens, List<Message> messages, ResponseFormat responseFormat) {

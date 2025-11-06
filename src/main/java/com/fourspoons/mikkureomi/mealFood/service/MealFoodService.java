@@ -11,7 +11,6 @@ import com.fourspoons.mikkureomi.mealFood.dto.request.MealFoodRequestDto;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import com.fourspoons.mikkureomi.mealFood.repository.MealFoodRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class MealFoodService {
     private final FoodService foodService;
 
 
-    /** 1. 식사 (Meal)와 음식 목록 (MealFood) 동시 등록 (Create) */
+    // 1. 식사 (Meal)와 음식 목록 (MealFood) 동시 등록 (Create)
     @Transactional
     public List<MealFoodResponseDto> createMealWithFoods(Long profileId, MealCreateRequestDto requestDto) {
 
@@ -83,24 +82,4 @@ public class MealFoodService {
                 .collect(Collectors.toList());
     }
 
-
-    /** 3. 특정 MealFood 단일 수정 (Update) */
-//    @Transactional
-//    public MealFoodResponseDto updateMealFood(Long mealFoodId, MealFoodRequestDto requestDto) {
-//        MealFood mealFood = mealFoodRepository.findById(mealFoodId)
-//                .orElseThrow(() -> new EntityNotFoundException("MealFood not found with id: " + mealFoodId));
-//
-//        mealFood.update(requestDto);
-//
-//        return new MealFoodResponseDto(mealFood);
-//    }
-
-    /** 4. 특정 MealFood 삭제 (Delete) */
-    @Transactional
-    public void deleteMealFood(Long mealFoodId) {
-        if (!mealFoodRepository.existsById(mealFoodId)) {
-            throw new EntityNotFoundException("MealFood not found with id: " + mealFoodId);
-        }
-        mealFoodRepository.deleteById(mealFoodId);
-    }
 }
