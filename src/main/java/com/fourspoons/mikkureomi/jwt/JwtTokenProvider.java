@@ -32,12 +32,13 @@ public class JwtTokenProvider {
     protected void init() {
         byte[] keyBytes = Base64.getDecoder().decode(secretKeyString.trim());
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        log.info("✅ JWT Secret Key 초기화 완료 (Base64 디코딩 방식)");
+        log.info("JWT Secret Key 초기화 완료 (Base64 디코딩 방식)");
 
     }
 
+    // TODO: 토큰 유효기간 1시간으로 변경
     //    private final long TOKEN_VALIDITY = 1000L * 60 * 60; // 1시간
-    private final long TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7; // 테스트용, 7일
+    private final long TOKEN_VALIDITY = 1000L * 60 * 60 * 24; // 테스트용, 1일
 
     private final UserDetailsService userDetailsService;
 

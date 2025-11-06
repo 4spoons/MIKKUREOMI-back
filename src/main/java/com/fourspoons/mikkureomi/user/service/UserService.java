@@ -58,9 +58,6 @@ public class UserService {
 
 
     private void validatePassword(String rawPassword, String encodedPassword) {
-        System.out.println("rawPassword = " + rawPassword);
-        System.out.println("encodedPassword = " + encodedPassword);
-
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new CustomException(ErrorMessage.INVALID_PASSWORD);
         }
