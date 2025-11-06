@@ -30,18 +30,11 @@ public class DailyReport extends BaseTimeEntity {
     @JoinColumn(name = "profileId", nullable = false)
     private Profile profile; // 1:N 관계 (N이 DailyReport)
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "monthlyReportId") // 월간 리포트는 나중에 구현
-    // private MonthlyReport monthlyReport;
-
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @Column(name = "score", nullable = false)
     private Integer score; // 0 ~ 100
-
-    @Column(name = "comment", length = 500)
-    private String comment;
 
     @Column(name = "daily_calories")
     @Builder.Default
@@ -77,9 +70,8 @@ public class DailyReport extends BaseTimeEntity {
     @Builder.Default
     private List<Meal> meals = new ArrayList<>();
 
-    public void updateReport(Integer newScore, String newComment) {
+    public void updateReport(Integer newScore) {
         this.score = newScore;
-        this.comment = newComment;
     }
 
     public void addNutrients(MealNutrientSummary summary) {
