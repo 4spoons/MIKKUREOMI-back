@@ -39,6 +39,9 @@ public enum ErrorMessage {
     // --- Notification
     NOTIFICATION_NOT_FOUND("해당 알림 정보를 찾을 수 없습니다."),
 
+    // --- Daily Report
+    MONTHLY_REPORT_NOT_FOUND("해당 먼슬리 리포트 정보를 찾을 수 없습니다."),
+
     // --- Server ---
     INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     private final String message;

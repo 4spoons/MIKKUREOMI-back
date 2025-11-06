@@ -7,6 +7,7 @@ import com.fourspoons.mikkureomi.dailyReport.repository.DailyReportRepository;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.monthlyReport.domain.MonthlyReport;
+import com.fourspoons.mikkureomi.monthlyReport.dto.response.MonthlyReportResponseDto;
 import com.fourspoons.mikkureomi.monthlyReport.repository.MonthlyReportRepository;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
@@ -29,6 +30,15 @@ public class MonthlyReportService {
     private final ChatGPTService chatGPTService;
     private final ProfileRepository profileRepository;
     private final RecommendedNutrientsService recommendedNutrientsService;
+
+    // 특정 프로필의 특정 연/월에 해당하는 월간 보고서를 조회
+    public MonthlyReportResponseDto getMonthlyReport(Long profileId, Integer year, Integer month) {
+
+        MonthlyReport report = monthlyReportRepository.findByProfile_ProfileIdAndYearAndMonth(profileId, year, month)
+                .orElseThrow(() -> new CustomException(ErrorMessage.MONTHLY_REPORT_NOT_FOUND));
+
+        return MonthlyReportResponseDto.from(report);
+    }
 
     // --- 1. 생성 로직 (해당 월의 첫 DailyReport가 생성될 때 MonthlyReport를 생성) ---
     @Transactional
