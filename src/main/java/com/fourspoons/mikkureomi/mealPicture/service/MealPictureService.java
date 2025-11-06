@@ -1,6 +1,9 @@
 package com.fourspoons.mikkureomi.mealPicture.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fourspoons.mikkureomi.aws.AwsS3Service;
+import com.fourspoons.mikkureomi.chatgptAnalysis.dto.response.ChatGPTResponseDto;
+import com.fourspoons.mikkureomi.chatgptAnalysis.service.ChatGPTService;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.food.domain.Food;
@@ -14,8 +17,10 @@ import com.fourspoons.mikkureomi.mealFood.dto.response.MealFoodResponseDto;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import com.fourspoons.mikkureomi.mealFood.repository.MealFoodRepository;
 import com.fourspoons.mikkureomi.mealPicture.domain.MealPicture;
+import com.fourspoons.mikkureomi.mealPicture.dto.request.FoodRecognitionDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.request.MealFinalSaveRequestDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.request.MealPictureRequestDto;
+import com.fourspoons.mikkureomi.mealPicture.dto.request.RecognizedFood;
 import com.fourspoons.mikkureomi.mealPicture.dto.response.MealPictureResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.dto.response.RecognizedFoodResponseDto;
 import com.fourspoons.mikkureomi.mealPicture.repository.MealPictureRepository;
@@ -25,9 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,29 +48,43 @@ public class MealPictureService {
     private final MealService mealService;
     private final FoodRepository foodRepository;
     private final FoodService foodService;
+    private final ChatGPTService chatGPTService;
 
-    /** 1-1. 사진 URL을 받아 인식된 음식 목록을 반환합니다. (저장 로직 없음) */
-    public List<RecognizedFoodResponseDto> recognizeFoodsFromPicture(MultipartFile imageFile) {
+    // 1-1. 사진 URL을 받아 인식된 음식 목록을 반환 (저장 로직 없음)
+    public List<RecognizedFoodResponseDto> recognizeFoodsFromPicture(MultipartFile imageFile) throws IOException {
 
-        // 음식 인식 과정 대체
-        // 실제 구현 시 외부 AI 모델 호출 로직이 들어감
-        List<MealFoodRequestDto> recognizedDtos = createDummyFoodRequests();
+        // 1. ChatGPT API 호출 및 응답 파싱
+        ChatGPTResponseDto response = chatGPTService.requestImageAnalysis(imageFile);
+        String jsonString = response.getChoices().get(0).getMessage().getContent();
 
-        // Stream을 사용하여 DTO 리스트를 FoodNameAndIdDto 리스트로 변환
-        List<RecognizedFoodResponseDto> responseDtos = recognizedDtos.stream()
-                .map(dto -> {
-                    Long foodId = dto.getFoodId();
-                    Food food = foodRepository.findById(foodId)
-                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 음식 ID: " + foodId));
-                    return food;
-                })
+        // Food db에서 foodNm으로 인식한 음식 찾아서 id list 생성
+        List<String> recognizedFoodNames = parseRecognizedFoods(jsonString);
+
+        // 2. 스트림을 사용하여 DB 매칭 및 매핑
+        List<RecognizedFoodResponseDto> responseDtos = recognizedFoodNames.stream()
+                .map(foodService::findBestMatchFoodId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(foodId -> foodRepository.findById(foodId).orElseThrow(() ->
+                        new IllegalStateException("매칭된 ID(" + foodId + ")의 데이터가 DB에 없습니다.")))
                 .map(food -> new RecognizedFoodResponseDto(food.getId(), food.getFoodNm()))
                 .collect(Collectors.toList());
 
         return responseDtos;
     }
 
-    /** 1-2. 최종 확정된 음식 목록과 URL을 받아 모든 엔티티를 생성하고 저장합니다. */
+    private List<String> parseRecognizedFoods(String jsonString) {
+        try {
+            FoodRecognitionDto dto = new ObjectMapper().readValue(jsonString, FoodRecognitionDto.class);
+            return dto.getDetectedFoods().stream()
+                    .map(RecognizedFood::getName)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("GPT 응답 JSON 파싱 실패", e);
+        }
+    }
+
+    // 1-2. 최종 확정된 음식 목록과 URL을 받아 모든 엔티티를 생성하고 저장
     @Transactional
     public List<MealFoodResponseDto> saveFinalMealComposition(Long profileId, MultipartFile imageFile, MealFinalSaveRequestDto requestDto) {
 
@@ -126,7 +147,7 @@ public class MealPictureService {
     }
 
 
-    /** 3. Meal ID로 MealPicture 조회 (Read by Meal ID) */
+    // 2. Meal ID로 MealPicture 조회 (Read by Meal ID)
     public MealPictureResponseDto getMealPictureByMealId(Long profileId, Long mealId) {
         mealService.checkAccessToMeal(profileId, mealId);
 
@@ -135,14 +156,14 @@ public class MealPictureService {
         return new MealPictureResponseDto(picture);
     }
 
-    /** 2. 특정 MealPicture 조회 (Read One) */
+    // 3. 특정 MealPicture 조회 (Read One)
     public MealPictureResponseDto getMealPicture(Long pictureId) {
         MealPicture picture = mealPictureRepository.findById(pictureId)
                 .orElseThrow(() -> new EntityNotFoundException("MealPicture not found with id: " + pictureId));
         return new MealPictureResponseDto(picture);
     }
 
-    /** 4. MealPicture 수정 (Update: 주로 URL 변경) */
+    // 4. MealPicture 수정 (Update: 주로 URL 변경)
     @Transactional
     public MealPictureResponseDto updateMealPicture(Long pictureId, MealPictureRequestDto requestDto) {
         MealPicture mealPicture = mealPictureRepository.findById(pictureId)
@@ -153,23 +174,12 @@ public class MealPictureService {
         return new MealPictureResponseDto(mealPicture);
     }
 
-    /** 5. MealPicture 삭제 (Delete) */
+    // 5. MealPicture 삭제 (Delete)
     @Transactional
     public void deleteMealPicture(Long pictureId) {
         MealPicture mealPicture = mealPictureRepository.findById(pictureId)
                 .orElseThrow(() -> new EntityNotFoundException("MealPicture not found with id: " + pictureId));
 
         mealPictureRepository.delete(mealPicture);
-    }
-
-    // 음식 인식 더미 데이터 (예시)
-    private List<MealFoodRequestDto> createDummyFoodRequests() {
-        // Dummy 1: 샐러드
-        MealFoodRequestDto salad = new MealFoodRequestDto(7L, new BigDecimal("1"));
-
-        // Dummy 2: 닭가슴살
-        MealFoodRequestDto chicken = new MealFoodRequestDto(16L, new BigDecimal("1"));
-
-        return List.of(salad, chicken);
     }
 }

@@ -8,6 +8,7 @@ import com.fourspoons.mikkureomi.food.dto.response.FoodSearchResponse;
 import com.fourspoons.mikkureomi.food.repository.FoodRepository;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,46 @@ public class FoodService {
                 .orElseThrow(() -> new CustomException(ErrorMessage.FOOD_NOT_FOUND));
 
         return FoodDetailResponse.from(food);
+    }
+
+    // GPT가 인식한 이름에 대해 DB에서 가장 적합한 Food ID를 찾음
+    public Optional<Long> findBestMatchFoodId(String recognizedFoodName) {
+
+        // 1. DB에서 유사 항목 모두 검색 (SQL LIKE 사용)
+        List<Food> candidates = foodRepository.findByNameContaining(recognizedFoodName);
+
+        if (candidates.isEmpty()) {
+            return Optional.empty(); // 유사 항목을 전혀 찾지 못함
+        }
+
+        // 3. 최적 항목 선택 로직 적용
+        Food bestMatch = candidates.stream()
+                .min((item1, item2) -> {
+                    // A. 레벤슈타인 거리 계산
+                    int dist1 = LevenshteinDistance.getDefaultInstance().apply(recognizedFoodName, item1.getFoodNm());
+                    int dist2 = LevenshteinDistance.getDefaultInstance().apply(recognizedFoodName, item2.getFoodNm());
+
+                    // 1순위: 거리 비교 (가장 작은 거리가 승리)
+                    int distanceCompare = Integer.compare(dist1, dist2);
+                    if (distanceCompare != 0) {
+                        return distanceCompare;
+                    }
+
+                    // 2순위: 거리가 같으면, 이름 길이 비교 (가장 짧은 이름이 승리 = 일반적인 이름)
+                    return Integer.compare(item1.getFoodNm().length(), item2.getFoodNm().length());
+                })
+                .get();
+
+        // 4. 임계값 검사 (선택적)
+        int bestDistance = LevenshteinDistance.getDefaultInstance().apply(recognizedFoodName, bestMatch.getFoodNm());
+        // MAX_DISTANCE_THRESHOLD는 서비스 클래스에 상수로 정의
+        final int MAX_DISTANCE_THRESHOLD = 3;
+
+        if (bestDistance <= MAX_DISTANCE_THRESHOLD) {
+            return Optional.of(bestMatch.getId());
+        } else {
+            return Optional.empty(); // 매칭은 되었으나, 유사도가 너무 낮아 건너뛰어야 함
+        }
     }
 
     public BigDecimal calNutri(BigDecimal valuePer100g, BigDecimal foodSize, BigDecimal quantity) {
