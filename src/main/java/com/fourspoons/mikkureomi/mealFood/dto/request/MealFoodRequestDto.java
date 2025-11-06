@@ -13,13 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class MealFoodRequestDto {
 
-    private String foodName;
+    private Long foodId;
     private BigDecimal quantity;
-    private BigDecimal calories;
-    private BigDecimal carbohydrates;
-    private BigDecimal dietaryFiber;
-    private BigDecimal protein;
-    private BigDecimal fat;
-    private BigDecimal sugars;
-    private BigDecimal sodium;
 }

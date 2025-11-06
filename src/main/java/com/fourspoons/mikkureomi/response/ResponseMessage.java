@@ -31,6 +31,12 @@ public enum ResponseMessage {
     GET_DAILY_REPORT_SUCCESS("데일리 리포트 조회가 완료되었습니다."),
     DELETE_DAILY_REPORT_SUCCESS("데일리 리포트가 삭제되었습니다."),
 
+    // Food
+    SYNC_DATA_SUCCESS("공공데이터 동기화가 완료되었습니다."),
+    SEARCH_FOOD_SUCCESS("음식 검색이 완료되었습니다."),
+    GET_FOOD_DETAIL_SUCCESS("음식 정보 조회가 완료되었습니다."),
+
+
     // Recommendation
     RECOMMENDATION_FETCH_SUCCESS("영양성분 권장섭취량 조회가 완료되었습니다.");
     
