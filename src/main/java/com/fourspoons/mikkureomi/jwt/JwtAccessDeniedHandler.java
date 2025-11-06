@@ -23,6 +23,5 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
             String json = new ObjectMapper().writeValueAsString(body);
 
             response.getWriter().write(json);
-
         }
 }
