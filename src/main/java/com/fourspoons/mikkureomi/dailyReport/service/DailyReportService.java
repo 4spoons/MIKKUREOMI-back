@@ -67,20 +67,18 @@ public class DailyReportService {
                 .profile(profile)
                 .date(date)
                 .score(0) // 초기 점수 0점
-                .comment("오늘의 첫 식사입니다.") // 초기 코멘트
                 .build();
 
         return dailyReportRepository.save(newReport);
     }
 
-    // DailyReport 점수/코멘트 업데이트 로직 (Meal이 추가될 때마다 호출)
+    // DailyReport 점수 업데이트 로직 (Meal이 추가될 때마다 호출)
     @Transactional
     public void updateReportOnNewMeal(DailyReport report) {
 
         Integer newScore = Math.min(100, report.getScore() + 10); // 점수 10점씩 증가 (최대 100점)
-        String newComment = String.format("총 XX개의 식사가 기록되었습니다. 잘하고 있어요!");
 
-        report.updateReport(newScore, newComment);
+        report.updateReport(newScore);
     }
 
     @Transactional

@@ -16,7 +16,6 @@ public class DailyReportResponseDto {
     private final Long profileId;
     private final LocalDate date;
     private final Integer score;
-    private final String comment;
 
 
     private final LocalDateTime createdAt;
@@ -41,7 +40,6 @@ public class DailyReportResponseDto {
         this.profileId = dailyReport.getProfile().getProfileId();
         this.date = dailyReport.getDate();
         this.score = dailyReport.getScore();
-        this.comment = dailyReport.getComment();
         this.createdAt = dailyReport.getCreatedAt();
         this.modifiedAt = dailyReport.getModifiedAt();
 

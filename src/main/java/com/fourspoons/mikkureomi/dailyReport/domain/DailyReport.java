@@ -40,9 +40,6 @@ public class DailyReport extends BaseTimeEntity {
     @Column(name = "score", nullable = false)
     private Integer score; // 0 ~ 100
 
-    @Column(name = "comment", length = 500)
-    private String comment;
-
     @Column(name = "daily_calories")
     @Builder.Default
     private BigDecimal dailyCalories = BigDecimal.ZERO;
@@ -77,9 +74,8 @@ public class DailyReport extends BaseTimeEntity {
     @Builder.Default
     private List<Meal> meals = new ArrayList<>();
 
-    public void updateReport(Integer newScore, String newComment) {
+    public void updateReport(Integer newScore) {
         this.score = newScore;
-        this.comment = newComment;
     }
 
     public void addNutrients(MealNutrientSummary summary) {
