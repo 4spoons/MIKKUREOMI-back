@@ -18,8 +18,7 @@ public class ChatGPTController {
     private final ChatGPTService chatGPTService;
 
     @PostMapping("/image")
-    public String imageAnalysis(@RequestParam MultipartFile image)
-            throws IOException {
+    public String imageAnalysis(@RequestParam MultipartFile image) throws IOException {
         ChatGPTResponseDto response = chatGPTService.requestImageAnalysis(image);
         return response.getChoices().get(0).getMessage().getContent();
     }
