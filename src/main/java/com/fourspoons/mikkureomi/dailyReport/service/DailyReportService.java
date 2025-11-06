@@ -6,11 +6,13 @@ import com.fourspoons.mikkureomi.dailyReport.repository.DailyReportRepository;
 import com.fourspoons.mikkureomi.exception.CustomException;
 import com.fourspoons.mikkureomi.exception.ErrorMessage;
 import com.fourspoons.mikkureomi.mealFood.dto.response.MealNutrientSummary;
+import com.fourspoons.mikkureomi.notification.service.NotificationService;
 import com.fourspoons.mikkureomi.profile.domain.Profile;
 import com.fourspoons.mikkureomi.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.fourspoons.mikkureomi.notification.domain.NotificationCategory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,9 +24,9 @@ public class DailyReportService {
 
     private final DailyReportRepository dailyReportRepository;
     private final ProfileRepository profileRepository;
+    private final NotificationService notificationService;
 
-    /** * 1. 단일 DailyReport 조회 (Read One by Date and Profile)
-     */
+    // 1. 단일 DailyReport 조회 (Read One by Date and Profile
     public DailyReportResponseDto getDailyReportByDate(Long profileId, LocalDate date) {
         DailyReport report = dailyReportRepository.findByProfile_ProfileIdAndDate(profileId, date)
                 .orElseThrow(() -> new CustomException(ErrorMessage.DAILY_REPORT_NOT_FOUND));
@@ -81,6 +83,21 @@ public class DailyReportService {
         String newComment = String.format("총 XX개의 식사가 기록되었습니다. 잘하고 있어요!");
 
         report.updateReport(newScore, newComment);
+
+        final int TARGET_SCORE = 70;
+
+        // 70점 달성시 알림 전송
+        if (report.getScore() >= TARGET_SCORE) {
+            Long profileId = report.getProfile().getProfileId(); // DailyReport에서 Profile ID 획득
+
+            notificationService.createNotificationLog(
+                    profileId,
+                    NotificationCategory.GOOD_SCORE_ALERT,
+                    NotificationCategory.GOOD_SCORE_ALERT.getDefaultContent(), // "일일 식사 영양 점수 70점 이상!..."
+                    "mikkureomi://app/report/daily" // 일일 보고서 페이지 Deep Link
+            );
+            System.out.println("LOGGED: Profile " + profileId + " 70점 달성 알림 기록.");
+        }
     }
 
     @Transactional
