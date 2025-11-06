@@ -59,7 +59,7 @@ public class NotificationService {
         List<Long> allProfileIds = profileRepository.findAllActiveProfileIds();
 
         LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
-        String deeplink = "mikkureomi://app/map/nearby";
+        String deeplink = "mikkureomi://app/uploadMeal";
         NotificationCategory category = NotificationCategory.MISSED_MEAL_ALERT;
 
         for (Long profileId : allProfileIds) {
