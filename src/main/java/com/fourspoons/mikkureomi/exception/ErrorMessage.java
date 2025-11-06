@@ -28,6 +28,9 @@ public enum ErrorMessage {
 
     // --- Daily Report
     DAILY_REPORT_NOT_FOUND("해당 데일리 리포트 정보를 찾을 수 없습니다."),
+  
+    // --- Food ---
+    FOOD_NOT_FOUND("해당 음식 정보를 찾을 수 없습니다."),
 
     // --- Recommendation ---
     RECOMMENDED_NUTRIENTS_NOT_FOUND("해당 나이/성별에 대한 권장 영양 기준이 없습니다."),
