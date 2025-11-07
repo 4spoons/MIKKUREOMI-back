@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  * (데이터가 10만 개 미만일 때만 수행합니다. 착한가격 업소는 'GOOD_STORE' 타입으로 저장됩니다.)
  */
 @Slf4j // 로깅 라이브러리 추가
-//@Profile("local") // "local" 프로필에서만 컴포넌트 활성화
+@Profile("local") // "local" 프로필에서만 컴포넌트 활성화
 @Component
 @RequiredArgsConstructor
 public class SeoulGoodRestaurantUploadService {
